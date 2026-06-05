@@ -1,0 +1,16 @@
+# k6 result files (large JSON/logs)
+k6-perf-tests/results/*.json
+k6-perf-tests/results/*.log
+k6-perf-tests/results/*.txt
+
+# Temp files from debugging
+k6-perf-tests/resp*.txt
+k6-perf-tests/userAccess.html
+k6-perf-tests/login*.html
+k6-perf-tests/cookies.txt
+k6-perf-tests/headers.txt
+k6-perf-tests/api_docs.json
+
+# Keep the HTML dashboard and XML report
+!k6-perf-tests/results/autorox_perf_dashboard.html
+!k6-perf-tests/results/autorox_perf_report.xml
