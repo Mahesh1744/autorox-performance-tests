@@ -1,24 +1,14 @@
 name: Autorox API Performance Tests
 
-# ─────────────────────────────────────────────
-# TRIGGERS
-# ─────────────────────────────────────────────
 on:
-  # Run smoke test on every push / PR to main
   push:
     branches: [main, master]
-    paths:
-      - 'k6-perf-tests/**'
+    paths: ['k6-perf-tests/**']
   pull_request:
     branches: [main, master]
-    paths:
-      - 'k6-perf-tests/**'
-
-  # Full suite every day at 2:00 AM UTC
+    paths: ['k6-perf-tests/**']
   schedule:
     - cron: '0 2 * * *'
-
-  # Manual trigger — choose which test to run
   workflow_dispatch:
     inputs:
       test_type:
@@ -26,23 +16,11 @@ on:
         required: true
         default: 'smoke'
         type: choice
-        options:
-          - smoke
-          - load
-          - stress
-          - spike
-          - soak
-          - scalability
-          - all
+        options: [smoke, load, stress, spike, soak, scalability, all]
 
-# ─────────────────────────────────────────────
-# JOBS
-# ─────────────────────────────────────────────
 jobs:
 
-  # ──────────────────────────────────────────
-  # JOB 1 : SMOKE  (runs on every push / PR)
-  # ──────────────────────────────────────────
+  # ── SMOKE (every push / PR) ─────────────────
   smoke:
     name: Smoke Test (1 VU · 2 min)
     runs-on: ubuntu-latest
@@ -51,22 +29,11 @@ jobs:
       github.event_name == 'pull_request' ||
       (github.event_name == 'workflow_dispatch' &&
        (github.event.inputs.test_type == 'smoke' || github.event.inputs.test_type == 'all'))
-
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-      - name: Install k6
-        run: |
-          sudo gpg --no-default-keyring \
-            --keyring /usr/share/keyrings/k6-archive-keyring.gpg \
-            --keyserver hkp://keyserver.ubuntu.com:80 \
-            --recv-keys C5AD17C747E3415A3642D57D77C6C491D6AC1D69
-          echo "deb [signed-by=/usr/share/keyrings/k6-archive-keyring.gpg] \
-            https://dl.k6.io/deb stable main" \
-            | sudo tee /etc/apt/sources.list.d/k6.list
-          sudo apt-get update -qq
-          sudo apt-get install -y k6
+      - name: Setup k6
+        uses: grafana/setup-k6-action@v1
 
       - name: Run Smoke Test
         env:
@@ -86,22 +53,17 @@ jobs:
           echo "## Smoke Test Results" >> $GITHUB_STEP_SUMMARY
           echo '```' >> $GITHUB_STEP_SUMMARY
           grep -E "✓|✗|checks_|http_req_duration|http_req_failed|iterations|workshopId" \
-            k6-perf-tests/results/smoke_ci.log | tail -30 >> $GITHUB_STEP_SUMMARY
+            k6-perf-tests/results/smoke_ci.log | tail -30 >> $GITHUB_STEP_SUMMARY || true
           echo '```' >> $GITHUB_STEP_SUMMARY
 
-      - name: Upload Smoke Results
+      - uses: actions/upload-artifact@v4
         if: always()
-        uses: actions/upload-artifact@v4
         with:
           name: smoke-results-${{ github.run_number }}
-          path: |
-            k6-perf-tests/results/smoke_ci.log
-            k6-perf-tests/results/smoke_ci.json
+          path: k6-perf-tests/results/smoke_ci.*
           retention-days: 30
 
-  # ──────────────────────────────────────────
-  # JOB 2 : LOAD
-  # ──────────────────────────────────────────
+  # ── LOAD ────────────────────────────────────
   load:
     name: Load Test (25 VUs · 8 min)
     runs-on: ubuntu-latest
@@ -110,20 +72,11 @@ jobs:
       github.event_name == 'schedule' ||
       (github.event_name == 'workflow_dispatch' &&
        (github.event.inputs.test_type == 'load' || github.event.inputs.test_type == 'all'))
-
     steps:
       - uses: actions/checkout@v4
 
-      - name: Install k6
-        run: |
-          sudo gpg --no-default-keyring \
-            --keyring /usr/share/keyrings/k6-archive-keyring.gpg \
-            --keyserver hkp://keyserver.ubuntu.com:80 \
-            --recv-keys C5AD17C747E3415A3642D57D77C6C491D6AC1D69
-          echo "deb [signed-by=/usr/share/keyrings/k6-archive-keyring.gpg] \
-            https://dl.k6.io/deb stable main" \
-            | sudo tee /etc/apt/sources.list.d/k6.list
-          sudo apt-get update -qq && sudo apt-get install -y k6
+      - name: Setup k6
+        uses: grafana/setup-k6-action@v1
 
       - name: Run Load Test
         env:
@@ -143,20 +96,17 @@ jobs:
           echo "## Load Test Results" >> $GITHUB_STEP_SUMMARY
           echo '```' >> $GITHUB_STEP_SUMMARY
           grep -E "✓|✗|checks_|http_req_duration|http_req_failed|iterations" \
-            k6-perf-tests/results/load_ci.log | tail -30 >> $GITHUB_STEP_SUMMARY
+            k6-perf-tests/results/load_ci.log | tail -30 >> $GITHUB_STEP_SUMMARY || true
           echo '```' >> $GITHUB_STEP_SUMMARY
 
-      - name: Upload Load Results
+      - uses: actions/upload-artifact@v4
         if: always()
-        uses: actions/upload-artifact@v4
         with:
           name: load-results-${{ github.run_number }}
           path: k6-perf-tests/results/load_ci.*
           retention-days: 30
 
-  # ──────────────────────────────────────────
-  # JOB 3 : STRESS
-  # ──────────────────────────────────────────
+  # ── STRESS ──────────────────────────────────
   stress:
     name: Stress Test (10→100 VUs · 11 min)
     runs-on: ubuntu-latest
@@ -165,20 +115,11 @@ jobs:
       github.event_name == 'schedule' ||
       (github.event_name == 'workflow_dispatch' &&
        (github.event.inputs.test_type == 'stress' || github.event.inputs.test_type == 'all'))
-
     steps:
       - uses: actions/checkout@v4
 
-      - name: Install k6
-        run: |
-          sudo gpg --no-default-keyring \
-            --keyring /usr/share/keyrings/k6-archive-keyring.gpg \
-            --keyserver hkp://keyserver.ubuntu.com:80 \
-            --recv-keys C5AD17C747E3415A3642D57D77C6C491D6AC1D69
-          echo "deb [signed-by=/usr/share/keyrings/k6-archive-keyring.gpg] \
-            https://dl.k6.io/deb stable main" \
-            | sudo tee /etc/apt/sources.list.d/k6.list
-          sudo apt-get update -qq && sudo apt-get install -y k6
+      - name: Setup k6
+        uses: grafana/setup-k6-action@v1
 
       - name: Run Stress Test
         env:
@@ -198,20 +139,17 @@ jobs:
           echo "## Stress Test Results" >> $GITHUB_STEP_SUMMARY
           echo '```' >> $GITHUB_STEP_SUMMARY
           grep -E "✓|✗|checks_|http_req_duration|http_req_failed|iterations" \
-            k6-perf-tests/results/stress_ci.log | tail -30 >> $GITHUB_STEP_SUMMARY
+            k6-perf-tests/results/stress_ci.log | tail -30 >> $GITHUB_STEP_SUMMARY || true
           echo '```' >> $GITHUB_STEP_SUMMARY
 
-      - name: Upload Stress Results
+      - uses: actions/upload-artifact@v4
         if: always()
-        uses: actions/upload-artifact@v4
         with:
           name: stress-results-${{ github.run_number }}
           path: k6-perf-tests/results/stress_ci.*
           retention-days: 30
 
-  # ──────────────────────────────────────────
-  # JOB 4 : SPIKE
-  # ──────────────────────────────────────────
+  # ── SPIKE ───────────────────────────────────
   spike:
     name: Spike Test (5→80 VUs · 5 min)
     runs-on: ubuntu-latest
@@ -220,20 +158,11 @@ jobs:
       github.event_name == 'schedule' ||
       (github.event_name == 'workflow_dispatch' &&
        (github.event.inputs.test_type == 'spike' || github.event.inputs.test_type == 'all'))
-
     steps:
       - uses: actions/checkout@v4
 
-      - name: Install k6
-        run: |
-          sudo gpg --no-default-keyring \
-            --keyring /usr/share/keyrings/k6-archive-keyring.gpg \
-            --keyserver hkp://keyserver.ubuntu.com:80 \
-            --recv-keys C5AD17C747E3415A3642D57D77C6C491D6AC1D69
-          echo "deb [signed-by=/usr/share/keyrings/k6-archive-keyring.gpg] \
-            https://dl.k6.io/deb stable main" \
-            | sudo tee /etc/apt/sources.list.d/k6.list
-          sudo apt-get update -qq && sudo apt-get install -y k6
+      - name: Setup k6
+        uses: grafana/setup-k6-action@v1
 
       - name: Run Spike Test
         env:
@@ -253,20 +182,17 @@ jobs:
           echo "## Spike Test Results" >> $GITHUB_STEP_SUMMARY
           echo '```' >> $GITHUB_STEP_SUMMARY
           grep -E "✓|✗|checks_|http_req_duration|http_req_failed|iterations" \
-            k6-perf-tests/results/spike_ci.log | tail -30 >> $GITHUB_STEP_SUMMARY
+            k6-perf-tests/results/spike_ci.log | tail -30 >> $GITHUB_STEP_SUMMARY || true
           echo '```' >> $GITHUB_STEP_SUMMARY
 
-      - name: Upload Spike Results
+      - uses: actions/upload-artifact@v4
         if: always()
-        uses: actions/upload-artifact@v4
         with:
           name: spike-results-${{ github.run_number }}
           path: k6-perf-tests/results/spike_ci.*
           retention-days: 30
 
-  # ──────────────────────────────────────────
-  # JOB 5 : SOAK
-  # ──────────────────────────────────────────
+  # ── SOAK ────────────────────────────────────
   soak:
     name: Soak Test (15 VUs · 34 min)
     runs-on: ubuntu-latest
@@ -275,20 +201,11 @@ jobs:
       github.event_name == 'schedule' ||
       (github.event_name == 'workflow_dispatch' &&
        (github.event.inputs.test_type == 'soak' || github.event.inputs.test_type == 'all'))
-
     steps:
       - uses: actions/checkout@v4
 
-      - name: Install k6
-        run: |
-          sudo gpg --no-default-keyring \
-            --keyring /usr/share/keyrings/k6-archive-keyring.gpg \
-            --keyserver hkp://keyserver.ubuntu.com:80 \
-            --recv-keys C5AD17C747E3415A3642D57D77C6C491D6AC1D69
-          echo "deb [signed-by=/usr/share/keyrings/k6-archive-keyring.gpg] \
-            https://dl.k6.io/deb stable main" \
-            | sudo tee /etc/apt/sources.list.d/k6.list
-          sudo apt-get update -qq && sudo apt-get install -y k6
+      - name: Setup k6
+        uses: grafana/setup-k6-action@v1
 
       - name: Run Soak Test
         env:
@@ -308,20 +225,17 @@ jobs:
           echo "## Soak Test Results" >> $GITHUB_STEP_SUMMARY
           echo '```' >> $GITHUB_STEP_SUMMARY
           grep -E "✓|✗|checks_|http_req_duration|http_req_failed|iterations" \
-            k6-perf-tests/results/soak_ci.log | tail -30 >> $GITHUB_STEP_SUMMARY
+            k6-perf-tests/results/soak_ci.log | tail -30 >> $GITHUB_STEP_SUMMARY || true
           echo '```' >> $GITHUB_STEP_SUMMARY
 
-      - name: Upload Soak Results
+      - uses: actions/upload-artifact@v4
         if: always()
-        uses: actions/upload-artifact@v4
         with:
           name: soak-results-${{ github.run_number }}
           path: k6-perf-tests/results/soak_ci.*
           retention-days: 30
 
-  # ──────────────────────────────────────────
-  # JOB 6 : SCALABILITY
-  # ──────────────────────────────────────────
+  # ── SCALABILITY ─────────────────────────────
   scalability:
     name: Scalability Test (5→50 VUs · 18 min)
     runs-on: ubuntu-latest
@@ -330,20 +244,11 @@ jobs:
       github.event_name == 'schedule' ||
       (github.event_name == 'workflow_dispatch' &&
        (github.event.inputs.test_type == 'scalability' || github.event.inputs.test_type == 'all'))
-
     steps:
       - uses: actions/checkout@v4
 
-      - name: Install k6
-        run: |
-          sudo gpg --no-default-keyring \
-            --keyring /usr/share/keyrings/k6-archive-keyring.gpg \
-            --keyserver hkp://keyserver.ubuntu.com:80 \
-            --recv-keys C5AD17C747E3415A3642D57D77C6C491D6AC1D69
-          echo "deb [signed-by=/usr/share/keyrings/k6-archive-keyring.gpg] \
-            https://dl.k6.io/deb stable main" \
-            | sudo tee /etc/apt/sources.list.d/k6.list
-          sudo apt-get update -qq && sudo apt-get install -y k6
+      - name: Setup k6
+        uses: grafana/setup-k6-action@v1
 
       - name: Run Scalability Test
         env:
@@ -363,12 +268,11 @@ jobs:
           echo "## Scalability Test Results" >> $GITHUB_STEP_SUMMARY
           echo '```' >> $GITHUB_STEP_SUMMARY
           grep -E "✓|✗|checks_|http_req_duration|http_req_failed|iterations|step_" \
-            k6-perf-tests/results/scalability_ci.log | tail -30 >> $GITHUB_STEP_SUMMARY
+            k6-perf-tests/results/scalability_ci.log | tail -30 >> $GITHUB_STEP_SUMMARY || true
           echo '```' >> $GITHUB_STEP_SUMMARY
 
-      - name: Upload Scalability Results
+      - uses: actions/upload-artifact@v4
         if: always()
-        uses: actions/upload-artifact@v4
         with:
           name: scalability-results-${{ github.run_number }}
           path: k6-perf-tests/results/scalability_ci.*
