@@ -37,14 +37,18 @@ jobs:
 
       - name: Run Smoke Test
         env:
-          PERF_BASE_URL: ${{ secrets.PERF_BASE_URL }}
-          PERF_USERNAME: ${{ secrets.PERF_USERNAME }}
-          PERF_PASSWORD: ${{ secrets.PERF_PASSWORD }}
+          PERF_BASE_URL:   ${{ secrets.PERF_BASE_URL }}
+          PERF_USERNAME:   ${{ secrets.PERF_USERNAME }}
+          PERF_PASSWORD:   ${{ secrets.PERF_PASSWORD }}
+          K6_CLOUD_TOKEN:  ${{ secrets.K6_CLOUD_TOKEN }}
         run: |
           mkdir -p k6-perf-tests/results
+          CLOUD_OUT=""
+          [ -n "$K6_CLOUD_TOKEN" ] && CLOUD_OUT="--out cloud"
           k6 run k6-perf-tests/smoke-test.js \
             --out json=k6-perf-tests/results/smoke_ci.json \
             --summary-trend-stats "avg,min,med,max,p(90),p(95),p(99)" \
+            $CLOUD_OUT \
             2>&1 | tee k6-perf-tests/results/smoke_ci.log
 
       - name: Post Job Summary
@@ -80,14 +84,18 @@ jobs:
 
       - name: Run Load Test
         env:
-          PERF_BASE_URL: ${{ secrets.PERF_BASE_URL }}
-          PERF_USERNAME: ${{ secrets.PERF_USERNAME }}
-          PERF_PASSWORD: ${{ secrets.PERF_PASSWORD }}
+          PERF_BASE_URL:   ${{ secrets.PERF_BASE_URL }}
+          PERF_USERNAME:   ${{ secrets.PERF_USERNAME }}
+          PERF_PASSWORD:   ${{ secrets.PERF_PASSWORD }}
+          K6_CLOUD_TOKEN:  ${{ secrets.K6_CLOUD_TOKEN }}
         run: |
           mkdir -p k6-perf-tests/results
+          CLOUD_OUT=""
+          [ -n "$K6_CLOUD_TOKEN" ] && CLOUD_OUT="--out cloud"
           k6 run k6-perf-tests/load-test.js \
             --out json=k6-perf-tests/results/load_ci.json \
             --summary-trend-stats "avg,min,med,max,p(90),p(95),p(99)" \
+            $CLOUD_OUT \
             2>&1 | tee k6-perf-tests/results/load_ci.log
 
       - name: Post Job Summary
@@ -123,14 +131,18 @@ jobs:
 
       - name: Run Stress Test
         env:
-          PERF_BASE_URL: ${{ secrets.PERF_BASE_URL }}
-          PERF_USERNAME: ${{ secrets.PERF_USERNAME }}
-          PERF_PASSWORD: ${{ secrets.PERF_PASSWORD }}
+          PERF_BASE_URL:   ${{ secrets.PERF_BASE_URL }}
+          PERF_USERNAME:   ${{ secrets.PERF_USERNAME }}
+          PERF_PASSWORD:   ${{ secrets.PERF_PASSWORD }}
+          K6_CLOUD_TOKEN:  ${{ secrets.K6_CLOUD_TOKEN }}
         run: |
           mkdir -p k6-perf-tests/results
+          CLOUD_OUT=""
+          [ -n "$K6_CLOUD_TOKEN" ] && CLOUD_OUT="--out cloud"
           k6 run k6-perf-tests/stress-test.js \
             --out json=k6-perf-tests/results/stress_ci.json \
             --summary-trend-stats "avg,min,med,max,p(90),p(95),p(99)" \
+            $CLOUD_OUT \
             2>&1 | tee k6-perf-tests/results/stress_ci.log
 
       - name: Post Job Summary
@@ -166,14 +178,18 @@ jobs:
 
       - name: Run Spike Test
         env:
-          PERF_BASE_URL: ${{ secrets.PERF_BASE_URL }}
-          PERF_USERNAME: ${{ secrets.PERF_USERNAME }}
-          PERF_PASSWORD: ${{ secrets.PERF_PASSWORD }}
+          PERF_BASE_URL:   ${{ secrets.PERF_BASE_URL }}
+          PERF_USERNAME:   ${{ secrets.PERF_USERNAME }}
+          PERF_PASSWORD:   ${{ secrets.PERF_PASSWORD }}
+          K6_CLOUD_TOKEN:  ${{ secrets.K6_CLOUD_TOKEN }}
         run: |
           mkdir -p k6-perf-tests/results
+          CLOUD_OUT=""
+          [ -n "$K6_CLOUD_TOKEN" ] && CLOUD_OUT="--out cloud"
           k6 run k6-perf-tests/spike-test.js \
             --out json=k6-perf-tests/results/spike_ci.json \
             --summary-trend-stats "avg,min,med,max,p(90),p(95),p(99)" \
+            $CLOUD_OUT \
             2>&1 | tee k6-perf-tests/results/spike_ci.log
 
       - name: Post Job Summary
@@ -209,14 +225,18 @@ jobs:
 
       - name: Run Soak Test
         env:
-          PERF_BASE_URL: ${{ secrets.PERF_BASE_URL }}
-          PERF_USERNAME: ${{ secrets.PERF_USERNAME }}
-          PERF_PASSWORD: ${{ secrets.PERF_PASSWORD }}
+          PERF_BASE_URL:   ${{ secrets.PERF_BASE_URL }}
+          PERF_USERNAME:   ${{ secrets.PERF_USERNAME }}
+          PERF_PASSWORD:   ${{ secrets.PERF_PASSWORD }}
+          K6_CLOUD_TOKEN:  ${{ secrets.K6_CLOUD_TOKEN }}
         run: |
           mkdir -p k6-perf-tests/results
+          CLOUD_OUT=""
+          [ -n "$K6_CLOUD_TOKEN" ] && CLOUD_OUT="--out cloud"
           k6 run k6-perf-tests/soak-test.js \
             --out json=k6-perf-tests/results/soak_ci.json \
             --summary-trend-stats "avg,min,med,max,p(90),p(95),p(99)" \
+            $CLOUD_OUT \
             2>&1 | tee k6-perf-tests/results/soak_ci.log
 
       - name: Post Job Summary
@@ -252,14 +272,18 @@ jobs:
 
       - name: Run Scalability Test
         env:
-          PERF_BASE_URL: ${{ secrets.PERF_BASE_URL }}
-          PERF_USERNAME: ${{ secrets.PERF_USERNAME }}
-          PERF_PASSWORD: ${{ secrets.PERF_PASSWORD }}
+          PERF_BASE_URL:   ${{ secrets.PERF_BASE_URL }}
+          PERF_USERNAME:   ${{ secrets.PERF_USERNAME }}
+          PERF_PASSWORD:   ${{ secrets.PERF_PASSWORD }}
+          K6_CLOUD_TOKEN:  ${{ secrets.K6_CLOUD_TOKEN }}
         run: |
           mkdir -p k6-perf-tests/results
+          CLOUD_OUT=""
+          [ -n "$K6_CLOUD_TOKEN" ] && CLOUD_OUT="--out cloud"
           k6 run k6-perf-tests/scalability-test.js \
             --out json=k6-perf-tests/results/scalability_ci.json \
             --summary-trend-stats "avg,min,med,max,p(90),p(95),p(99)" \
+            $CLOUD_OUT \
             2>&1 | tee k6-perf-tests/results/scalability_ci.log
 
       - name: Post Job Summary

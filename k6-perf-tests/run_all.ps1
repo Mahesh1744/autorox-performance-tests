@@ -8,6 +8,9 @@
 #   .\run_all.ps1 -Test spike
 #   .\run_all.ps1 -Test soak
 #   .\run_all.ps1 -Test scalability
+#
+# Grafana Cloud streaming (optional):
+#   Set $env:K6_CLOUD_TOKEN before running to stream results live.
 # ============================================================
 param(
     [ValidateSet('smoke','load','stress','spike','soak','scalability','all')]
@@ -18,7 +21,14 @@ $ScriptDir  = $PSScriptRoot
 $ResultsDir = "$ScriptDir\results"
 New-Item -ItemType Directory -Force -Path $ResultsDir | Out-Null
 
-$Timestamp = Get-Date -Format 'yyyyMMdd_HHmmss'
+$Timestamp  = Get-Date -Format 'yyyyMMdd_HHmmss'
+$CloudToken = $env:K6_CLOUD_TOKEN
+
+if ($CloudToken) {
+    Write-Host "Grafana Cloud streaming ENABLED" -ForegroundColor Magenta
+} else {
+    Write-Host "Grafana Cloud streaming DISABLED (set `$env:K6_CLOUD_TOKEN to enable)" -ForegroundColor DarkGray
+}
 
 function Run-K6 {
     param([string]$Name, [string]$File)
@@ -32,10 +42,20 @@ function Run-K6 {
 
     $OutFile = "$ResultsDir\${Name}_${Timestamp}.json"
 
-    k6 run `
-        --out "json=$OutFile" `
-        --summary-trend-stats "avg,min,med,max,p(90),p(95),p(99)" `
-        "$ScriptDir\$File"
+    $k6Args = @(
+        'run',
+        '--out', "json=$OutFile",
+        '--summary-trend-stats', 'avg,min,med,max,p(90),p(95),p(99)'
+    )
+
+    if ($env:K6_CLOUD_TOKEN) {
+        $k6Args += '--out'
+        $k6Args += 'cloud'
+    }
+
+    $k6Args += "$ScriptDir\$File"
+
+    & k6 @k6Args
 
     if ($LASTEXITCODE -eq 0) {
         Write-Host "  [PASS] $Name completed successfully." -ForegroundColor Green
