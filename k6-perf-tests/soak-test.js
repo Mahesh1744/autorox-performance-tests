@@ -1,13 +1,13 @@
-﻿/**
+/**
  * SOAK / ENDURANCE TEST
  * Purpose : Detect memory leaks, connection pool exhaustion, and gradual
- *           performance degradation over sustained load.
- * Pattern : 15 VUs for 30 minutes.
- *   0 â†’ 15 VUs  (2 min ramp-up)
- *   15 VUs       (30 min steady)
- *   15 â†’ 0 VUs  (2 min ramp-down)
+ *           performance degradation under sustained production-level load.
+ * Pattern : 150 VUs for 60 minutes (1 hour).
+ *   0 -> 150 VUs  (3 min ramp-up)
+ *   150 VUs       (55 min steady — represents ~3% of 5K user base concurrent)
+ *   150 -> 0 VUs  (2 min ramp-down)
+ * Total   : 60 min
  * Pass    : p95 < 3 s throughout, error rate < 1%.
- * Tip     : Change the steady-state duration to '60m' for a full 1-hour soak.
  */
 import { check, sleep, group } from 'k6';
 import { Trend, Rate, Counter } from 'k6/metrics';
@@ -21,9 +21,9 @@ const soakReqCount    = new Counter('soak_req_count');
 
 export const options = {
   stages: [
-    { duration: '2m',  target: 15 },
-    { duration: '30m', target: 15 },
-    { duration: '2m',  target: 0  },
+    { duration: '3m',  target: 150 },
+    { duration: '55m', target: 150 },
+    { duration: '2m',  target: 0   },
   ],
   thresholds: {
     http_req_duration: ['p(95)<3000', 'p(99)<5000'],
@@ -64,11 +64,10 @@ export default function (data) {
     });
   });
 
-  sleep(2); // 2 s think time â†’ realistic sustained concurrency
+  sleep(2); // 2 s think time -> realistic sustained concurrency
 }
 
 // Buckets responses into 5-minute windows for trend analysis
 function timeBucket() {
   return `min_${Math.floor((__ITER * 2) / 300) * 5}`;
 }
-

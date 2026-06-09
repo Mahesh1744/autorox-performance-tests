@@ -1,7 +1,7 @@
 /**
  * SMOKE TEST
  * Purpose : Verify the system responds correctly under minimal load.
- * Pattern : 1 VU, 2 minutes.
+ * Pattern : 5 VUs, 2 minutes.
  * Pass    : All key endpoints return 2xx/3xx and p95 < 3 s.
  */
 import { check, sleep } from 'k6';
@@ -13,7 +13,7 @@ const reqDuration = new Trend('smoke_req_duration', true);
 const errorRate   = new Rate('smoke_error_rate');
 
 export const options = {
-  vus: 1,
+  vus: 5,
   duration: '2m',
   thresholds: {
     ...THRESHOLDS,

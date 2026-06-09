@@ -1,16 +1,15 @@
-﻿/**
+/**
  * SPIKE TEST
- * Purpose : Simulate sudden, extreme bursts of traffic (flash sale / viral event).
- *           Observe recovery behaviour after the spike drops.
+ * Purpose : Simulate sudden traffic bursts — morning workshop check-in rush,
+ *           service camp events, or mass notifications sending users to the app.
  * Pattern : 3 spike cycles.
- *   Baseline  :  5 VUs  (1 min)
- *   Spike     : 80 VUs  (30 s)  â† instant ramp
- *   Recovery  :  5 VUs  (1 min)
- *   Spike     : 80 VUs  (30 s)
- *   Recovery  :  5 VUs  (1 min)
- *   Spike     : 80 VUs  (30 s)
- *   Cool-down :  0 VUs  (30 s)
- * Pass    : p95 < 6 s during spikes, recovery p95 < 2 s within 60 s of spike end.
+ *   Baseline  : 100 VUs  (1.5 min)  <- normal concurrent load
+ *   Spike     : 800 VUs  (45 s)     <- instant ramp to 8x normal
+ *   Recovery  : 100 VUs  (1.5 min)  <- back to baseline
+ *   (repeat x3)
+ *   Cool-down :   0 VUs  (1 min)
+ * Total   : ~12 min
+ * Pass    : p95 < 8 s during spikes, error rate < 15%.
  */
 import { check, sleep } from 'k6';
 import { Trend, Rate, Counter } from 'k6/metrics';
@@ -23,28 +22,28 @@ const spikeReqCount    = new Counter('spike_req_count');
 export const options = {
   stages: [
     // Baseline
-    { duration: '1m',  target: 5  },
+    { duration: '1m30s', target: 100 },
     // Spike 1
-    { duration: '0s',  target: 80 },
-    { duration: '30s', target: 80 },
+    { duration: '0s',    target: 800 },
+    { duration: '45s',   target: 800 },
     // Recovery 1
-    { duration: '0s',  target: 5  },
-    { duration: '1m',  target: 5  },
+    { duration: '0s',    target: 100 },
+    { duration: '1m30s', target: 100 },
     // Spike 2
-    { duration: '0s',  target: 80 },
-    { duration: '30s', target: 80 },
+    { duration: '0s',    target: 800 },
+    { duration: '45s',   target: 800 },
     // Recovery 2
-    { duration: '0s',  target: 5  },
-    { duration: '1m',  target: 5  },
+    { duration: '0s',    target: 100 },
+    { duration: '1m30s', target: 100 },
     // Spike 3
-    { duration: '0s',  target: 80 },
-    { duration: '30s', target: 80 },
+    { duration: '0s',    target: 800 },
+    { duration: '45s',   target: 800 },
     // Cool-down
-    { duration: '0s',  target: 0  },
-    { duration: '30s', target: 0  },
+    { duration: '0s',    target: 0   },
+    { duration: '1m',    target: 0   },
   ],
   thresholds: {
-    http_req_duration: ['p(95)<6000'],
+    http_req_duration: ['p(95)<8000'],
     http_req_failed:   ['rate<0.15'],
     spike_error_rate:  ['rate<0.15'],
   },
@@ -67,7 +66,5 @@ export default function (data) {
     check(res, { [`spike_flow_${i} ok`]: () => ok });
   });
 
-  // No sleep â€” spike test intentionally hammers the server
   sleep(0.1);
 }
-

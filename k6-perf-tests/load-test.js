@@ -1,33 +1,34 @@
 ﻿/**
  * LOAD TEST
- * Purpose : Simulate expected normal production traffic.
- * Pattern : Ramp up â†’ steady state â†’ ramp down.
- *   0 â†’ 25 VUs over 2 min
- *   25 VUs for 5 min
- *   25 â†’ 0 VUs over 1 min
+ * Purpose : Simulate expected normal production traffic (thousands of users).
+ * Pattern : Ramp up → steady state → ramp down.
+ *   0 → 250 VUs over 3 min   (ramp-up)
+ *   250 VUs for 8 min        (steady state — ~10% of 5K user base concurrent)
+ *   250 → 0 VUs over 2 min   (ramp-down)
+ * Total   : 13 min
  * Pass    : p95 < 2 s, error rate < 1%.
  */
-import { check, sleep, group } from 'k6';
-import { Trend, Rate, Counter } from 'k6/metrics';
-import { login, runBusinessFlows, params, jsonParams } from './helpers.js';
-import { BASE_URL, ENDPOINTS, THRESHOLDS } from './config.js';
-import http from 'k6/http';
+import { check, sleep, group } from ‘k6’;
+import { Trend, Rate, Counter } from ‘k6/metrics’;
+import { login, runBusinessFlows, params, jsonParams } from ‘./helpers.js’;
+import { BASE_URL, ENDPOINTS, THRESHOLDS } from ‘./config.js’;
+import http from ‘k6/http’;
 
-const loadReqDuration = new Trend('load_req_duration', true);
-const loadErrorRate   = new Rate('load_error_rate');
-const loadReqCount    = new Counter('load_req_count');
+const loadReqDuration = new Trend(‘load_req_duration’, true);
+const loadErrorRate   = new Rate(‘load_error_rate’);
+const loadReqCount    = new Counter(‘load_req_count’);
 
 export const options = {
   stages: [
-    { duration: '2m', target: 25 },
-    { duration: '5m', target: 25 },
-    { duration: '1m', target: 0  },
+    { duration: ‘3m’, target: 250 },
+    { duration: ‘8m’, target: 250 },
+    { duration: ‘2m’, target: 0   },
   ],
   thresholds: {
-    http_req_duration:    ['p(95)<2000', 'p(99)<4000'],
-    http_req_failed:      ['rate<0.01'],
-    load_error_rate:      ['rate<0.01'],
-    load_req_duration:    ['p(95)<2000'],
+    http_req_duration:    [‘p(95)<2000’, ‘p(99)<4000’],
+    http_req_failed:      [‘rate<0.01’],
+    load_error_rate:      [‘rate<0.01’],
+    load_req_duration:    [‘p(95)<2000’],
   },
 };
 

@@ -1,15 +1,17 @@
 ﻿/**
  * STRESS TEST
- * Purpose : Push the system beyond normal load to find the breaking point.
+ * Purpose : Push system beyond normal load to find the breaking point.
  *           Observe at which VU count errors spike or response time degrades.
- * Pattern : Step-up in 5 stages, each 2 min, then rapid ramp-down.
- *   Stage 1:  10 VUs
- *   Stage 2:  25 VUs
- *   Stage 3:  50 VUs
- *   Stage 4:  75 VUs
- *   Stage 5: 100 VUs
- *   Ramp-down: 0 VUs (1 min)
- * Pass    : p95 < 5 s, error rate < 10% (intentionally lenient to measure degr.)
+ * Pattern : Step-up in 6 stages (2 min each), then ramp-down.
+ *   Stage 1:  100 VUs
+ *   Stage 2:  250 VUs
+ *   Stage 3:  500 VUs
+ *   Stage 4:  750 VUs
+ *   Stage 5: 1000 VUs
+ *   Stage 6: 1000 VUs (hold — observe sustained stress)
+ *   Ramp-down: 0 VUs (2 min)
+ * Total   : 14 min
+ * Pass    : p95 < 8 s, error rate < 10% (lenient — goal is to measure degradation)
  */
 import { check, sleep, group } from 'k6';
 import { Trend, Rate, Counter, Gauge } from 'k6/metrics';
@@ -22,18 +24,19 @@ const stressActiveVUs    = new Gauge('stress_active_vus');
 
 export const options = {
   stages: [
-    { duration: '2m', target: 10  },
-    { duration: '2m', target: 25  },
-    { duration: '2m', target: 50  },
-    { duration: '2m', target: 75  },
-    { duration: '2m', target: 100 },
-    { duration: '1m', target: 0   },
+    { duration: '2m', target: 100  },
+    { duration: '2m', target: 250  },
+    { duration: '2m', target: 500  },
+    { duration: '2m', target: 750  },
+    { duration: '2m', target: 1000 },
+    { duration: '2m', target: 1000 },
+    { duration: '2m', target: 0    },
   ],
   thresholds: {
-    http_req_duration:    ['p(95)<5000'],
+    http_req_duration:    ['p(95)<8000'],
     http_req_failed:      ['rate<0.10'],
     stress_error_rate:    ['rate<0.10'],
-    stress_req_duration:  ['p(95)<5000'],
+    stress_req_duration:  ['p(95)<8000'],
   },
 };
 
@@ -61,12 +64,13 @@ export default function (data) {
 }
 
 function currentStage() {
-  const elapsed = (Date.now() / 1000) % (11 * 60); // rough stage estimation
-  if (elapsed < 120)  return '10vus';
-  if (elapsed < 240)  return '25vus';
-  if (elapsed < 360)  return '50vus';
-  if (elapsed < 480)  return '75vus';
-  if (elapsed < 600)  return '100vus';
+  const elapsed = (Date.now() / 1000) % (14 * 60);
+  if (elapsed < 120)  return '100vus';
+  if (elapsed < 240)  return '250vus';
+  if (elapsed < 360)  return '500vus';
+  if (elapsed < 480)  return '750vus';
+  if (elapsed < 600)  return '1000vus';
+  if (elapsed < 720)  return '1000vus_hold';
   return 'rampdown';
 }
 

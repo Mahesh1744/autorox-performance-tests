@@ -22,7 +22,7 @@ jobs:
 
   # ── SMOKE (every push / PR) ─────────────────
   smoke:
-    name: Smoke Test (1 VU · 2 min)
+    name: Smoke Test (5 VUs · 2 min)
     runs-on: ubuntu-latest
     if: >
       github.event_name == 'push' ||
@@ -69,7 +69,7 @@ jobs:
 
   # ── LOAD ────────────────────────────────────
   load:
-    name: Load Test (25 VUs · 8 min)
+    name: Load Test (250 VUs · 13 min)
     runs-on: ubuntu-latest
     needs: smoke
     if: >
@@ -116,7 +116,7 @@ jobs:
 
   # ── STRESS ──────────────────────────────────
   stress:
-    name: Stress Test (10→100 VUs · 11 min)
+    name: Stress Test (100→1000 VUs · 14 min)
     runs-on: ubuntu-latest
     needs: load
     if: >
@@ -163,7 +163,7 @@ jobs:
 
   # ── SPIKE ───────────────────────────────────
   spike:
-    name: Spike Test (5→80 VUs · 5 min)
+    name: Spike Test (100→800 VUs · 12 min)
     runs-on: ubuntu-latest
     needs: smoke
     if: >
@@ -210,7 +210,8 @@ jobs:
 
   # ── SOAK ────────────────────────────────────
   soak:
-    name: Soak Test (15 VUs · 34 min)
+    name: Soak Test (150 VUs · 60 min)
+    timeout-minutes: 75
     runs-on: ubuntu-latest
     needs: load
     if: >
@@ -257,7 +258,7 @@ jobs:
 
   # ── SCALABILITY ─────────────────────────────
   scalability:
-    name: Scalability Test (5→50 VUs · 18 min)
+    name: Scalability Test (50→1000 VUs · 21 min)
     runs-on: ubuntu-latest
     needs: load
     if: >
