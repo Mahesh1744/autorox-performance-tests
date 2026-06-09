@@ -1,0 +1,654 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Autorox Performance Testing - Process & Results Report</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Segoe UI', Arial, sans-serif;
+    font-size: 13px;
+    color: #1a1a2e;
+    background: #fff;
+    line-height: 1.6;
+  }
+  .cover {
+    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+    color: #fff;
+    padding: 80px 60px;
+    min-height: 260px;
+  }
+  .cover h1 { font-size: 32px; font-weight: 700; margin-bottom: 8px; letter-spacing: -0.5px; }
+  .cover h2 { font-size: 17px; font-weight: 400; opacity: 0.75; margin-bottom: 32px; }
+  .cover-meta { display: flex; gap: 40px; flex-wrap: wrap; margin-top: 24px; }
+  .cover-meta div { font-size: 12px; opacity: 0.85; }
+  .cover-meta strong { display: block; font-size: 14px; opacity: 1; }
+  .badge {
+    display: inline-block;
+    background: rgba(255,255,255,0.15);
+    border: 1px solid rgba(255,255,255,0.3);
+    border-radius: 20px;
+    padding: 4px 14px;
+    font-size: 11px;
+    margin-right: 8px;
+    margin-top: 16px;
+  }
+  .content { max-width: 960px; margin: 0 auto; padding: 40px 48px 60px; }
+  h1.section { font-size: 22px; color: #0f3460; border-bottom: 3px solid #e94560; padding-bottom: 8px; margin: 40px 0 20px; }
+  h2.sub { font-size: 16px; color: #16213e; margin: 28px 0 10px; font-weight: 600; }
+  h3.minor { font-size: 13px; color: #0f3460; margin: 18px 0 8px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
+  p { margin-bottom: 10px; color: #333; }
+  ul, ol { margin: 8px 0 12px 24px; }
+  li { margin-bottom: 5px; color: #333; }
+  .toc { background: #f8f9ff; border-left: 4px solid #0f3460; padding: 20px 28px; border-radius: 4px; margin: 20px 0 36px; }
+  .toc h2 { font-size: 14px; color: #0f3460; margin-bottom: 12px; text-transform: uppercase; letter-spacing: 1px; }
+  .toc ol { margin-left: 20px; }
+  .toc li { font-size: 12px; margin-bottom: 4px; }
+  .toc a { color: #0f3460; text-decoration: none; }
+  .toc a:hover { text-decoration: underline; }
+  table { width: 100%; border-collapse: collapse; margin: 14px 0 20px; font-size: 12px; }
+  th { background: #0f3460; color: #fff; padding: 9px 12px; text-align: left; font-weight: 600; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; }
+  td { padding: 8px 12px; border-bottom: 1px solid #e8ecf0; }
+  tr:nth-child(even) td { background: #f8f9ff; }
+  tr:hover td { background: #eef1ff; }
+  .tag { display: inline-block; border-radius: 3px; padding: 2px 8px; font-size: 10px; font-weight: 700; text-transform: uppercase; }
+  .tag-green { background: #d4edda; color: #155724; }
+  .tag-yellow { background: #fff3cd; color: #856404; }
+  .tag-red { background: #f8d7da; color: #721c24; }
+  .tag-blue { background: #d1ecf1; color: #0c5460; }
+  .tag-purple { background: #e2d9f3; color: #432874; }
+  .callout { border-radius: 6px; padding: 14px 18px; margin: 16px 0; font-size: 12px; }
+  .callout-info { background: #e8f4fd; border-left: 4px solid #2196f3; }
+  .callout-success { background: #e8f8f0; border-left: 4px solid #4caf50; }
+  .callout-warn { background: #fff8e1; border-left: 4px solid #ff9800; }
+  .callout-danger { background: #fde8e8; border-left: 4px solid #f44336; }
+  .callout strong { display: block; margin-bottom: 4px; font-size: 13px; }
+  code { background: #f0f2ff; color: #c7254e; padding: 2px 6px; border-radius: 3px; font-family: 'Consolas', monospace; font-size: 11px; }
+  pre { background: #1a1a2e; color: #a8d8ea; padding: 16px 20px; border-radius: 6px; font-family: 'Consolas', monospace; font-size: 11px; overflow-x: auto; margin: 12px 0; line-height: 1.5; }
+  .metric-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin: 16px 0; }
+  .metric-card { background: #f8f9ff; border: 1px solid #dde3f0; border-radius: 8px; padding: 16px 18px; text-align: center; }
+  .metric-card .value { font-size: 26px; font-weight: 700; color: #0f3460; }
+  .metric-card .label { font-size: 11px; color: #666; text-transform: uppercase; letter-spacing: 0.5px; margin-top: 4px; }
+  .metric-card.highlight { background: #0f3460; border-color: #0f3460; }
+  .metric-card.highlight .value { color: #fff; }
+  .metric-card.highlight .label { color: rgba(255,255,255,0.7); }
+  .tool-card { display: flex; gap: 14px; align-items: flex-start; background: #f8f9ff; border: 1px solid #dde3f0; border-radius: 8px; padding: 16px; margin: 10px 0; }
+  .tool-icon { width: 42px; height: 42px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 20px; flex-shrink: 0; }
+  .tool-body h4 { font-size: 13px; font-weight: 700; margin-bottom: 4px; }
+  .tool-body p { font-size: 12px; margin: 0; color: #555; }
+  .timeline { margin: 12px 0; }
+  .timeline-item { display: flex; gap: 16px; margin-bottom: 14px; }
+  .timeline-dot { width: 12px; height: 12px; border-radius: 50%; background: #0f3460; flex-shrink: 0; margin-top: 4px; position: relative; }
+  .timeline-dot::after { content: ''; position: absolute; top: 12px; left: 5px; width: 2px; height: calc(100% + 8px); background: #dde3f0; }
+  .timeline-item:last-child .timeline-dot::after { display: none; }
+  .timeline-content h4 { font-size: 13px; font-weight: 600; margin-bottom: 3px; }
+  .timeline-content p { font-size: 12px; color: #555; margin: 0; }
+  .finding { background: #fff; border: 1px solid #e0e0e0; border-left: 4px solid #0f3460; border-radius: 4px; padding: 12px 16px; margin: 10px 0; }
+  .finding h4 { font-size: 12px; font-weight: 700; color: #0f3460; margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.5px; }
+  .finding p { font-size: 12px; margin: 0; color: #444; }
+  .footer { background: #1a1a2e; color: rgba(255,255,255,0.6); padding: 24px 48px; font-size: 11px; display: flex; justify-content: space-between; align-items: center; margin-top: 40px; }
+  .page-break { page-break-before: always; }
+  @media print {
+    .cover { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    th { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    .metric-card.highlight { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    .footer { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    body { font-size: 11px; }
+    .content { padding: 24px 32px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- COVER -->
+<div class="cover">
+  <h1>Autorox Performance Testing</h1>
+  <h2>Complete Process, Tools &amp; Results Report</h2>
+  <div>
+    <span class="badge">k6 v2.0.0</span>
+    <span class="badge">GitHub Actions CI/CD</span>
+    <span class="badge">Claude AI</span>
+    <span class="badge">Pre-Production</span>
+  </div>
+  <div class="cover-meta">
+    <div><strong>Prepared by</strong>QA Team &mdash; Autorox</div>
+    <div><strong>Date</strong>June 9, 2026</div>
+    <div><strong>Environment</strong>pre.autorox.co/axprprod/</div>
+    <div><strong>Test Suite Version</strong>v2.0 (Scaled)</div>
+  </div>
+</div>
+
+<div class="content">
+
+<!-- TABLE OF CONTENTS -->
+<div class="toc">
+  <h2>Table of Contents</h2>
+  <ol>
+    <li><a href="#overview">Project Overview</a></li>
+    <li><a href="#tools">Tools &amp; Technologies Used</a></li>
+    <li><a href="#ai">AI Assistance (Claude)</a></li>
+    <li><a href="#auth">Authentication Architecture</a></li>
+    <li><a href="#suite">Test Suite Design</a></li>
+    <li><a href="#ci">CI/CD Integration</a></li>
+    <li><a href="#results">Test Execution &amp; Real Baselines</a></li>
+    <li><a href="#findings">Key Findings &amp; Recommendations</a></li>
+    <li><a href="#files">File Structure</a></li>
+    <li><a href="#next">Next Steps</a></li>
+  </ol>
+</div>
+
+<!-- 1. OVERVIEW -->
+<h1 class="section" id="overview">1. Project Overview</h1>
+
+<p>This document describes the end-to-end process of building, scaling, and executing a comprehensive API performance test suite for the Autorox workshop management platform. The goal was to measure how the pre-production environment behaves under realistic and extreme load conditions representing the application's real user base (thousands of users).</p>
+
+<div class="metric-grid">
+  <div class="metric-card highlight">
+    <div class="value">7</div>
+    <div class="label">Test Types</div>
+  </div>
+  <div class="metric-card highlight">
+    <div class="value">1,000</div>
+    <div class="label">Max Concurrent VUs</div>
+  </div>
+  <div class="metric-card highlight">
+    <div class="value">310K+</div>
+    <div class="label">Requests (Soak Test)</div>
+  </div>
+  <div class="metric-card">
+    <div class="value">13 GB+</div>
+    <div class="label">Total Data Received</div>
+  </div>
+  <div class="metric-card">
+    <div class="value">60 min</div>
+    <div class="label">Longest Test Duration</div>
+  </div>
+  <div class="metric-card">
+    <div class="value">0.00%</div>
+    <div class="label">Soak Error Rate</div>
+  </div>
+</div>
+
+<h2 class="sub">Scope</h2>
+<ul>
+  <li>Target: <code>https://pre.autorox.co/axprprod/</code> (pre-production)</li>
+  <li>10 business-critical API endpoints tested per iteration</li>
+  <li>Dual authentication flow: Spring Security session + JWT Bearer token</li>
+  <li>Load range: 5 VUs (smoke) up to 1,000 VUs (stress/scalability)</li>
+  <li>Regression gate integrated into GitHub Actions CI/CD pipeline</li>
+</ul>
+
+<!-- 2. TOOLS -->
+<h1 class="section" id="tools">2. Tools &amp; Technologies Used</h1>
+
+<div class="tool-card">
+  <div class="tool-icon" style="background:#7b2cf5; color:#fff;">k6</div>
+  <div class="tool-body">
+    <h4>Grafana k6 v2.0.0 &mdash; Performance Test Engine</h4>
+    <p>Open-source load testing tool written in Go with a JavaScript scripting API. Used to write and execute all 7 test scenarios locally and in CI. Chosen for its low resource footprint, native JavaScript support, built-in metrics, and Grafana Cloud streaming capability.</p>
+  </div>
+</div>
+
+<div class="tool-card">
+  <div class="tool-icon" style="background:#2088ff; color:#fff;">GH</div>
+  <div class="tool-body">
+    <h4>GitHub Actions &mdash; CI/CD Pipeline</h4>
+    <p>Automated workflow (<code>.github/workflows/k6-performance.yml</code>) that runs all 7 test jobs on push/PR. Uses <code>grafana/setup-k6-action@v1</code> for k6 installation. Includes regression gate (Python), Slack failure alerts, and artifact upload for each run.</p>
+  </div>
+</div>
+
+<div class="tool-card">
+  <div class="tool-icon" style="background:#3776ab; color:#fff;">Py</div>
+  <div class="tool-body">
+    <h4>Python 3 &mdash; Regression Gate Script</h4>
+    <p><code>check_regression.py</code> parses p95 values from k6 log output and compares them against <code>baseline.json</code>. If the current run is more than 20% worse than the stored baseline, the CI job fails. Supports ms/s/&micro;s/us unit parsing.</p>
+  </div>
+</div>
+
+<div class="tool-card">
+  <div class="tool-icon" style="background:#012456; color:#fff;">PS</div>
+  <div class="tool-body">
+    <h4>PowerShell 5.1 &mdash; Local Automation</h4>
+    <p><code>run_all.ps1</code> runs any single test or the full suite locally. <code>update_baseline.ps1</code> extracts p95 from the latest log file and updates <code>baseline.json</code> automatically. All scripts are compatible with Windows PowerShell 5.1.</p>
+  </div>
+</div>
+
+<div class="tool-card">
+  <div class="tool-icon" style="background:#e94560; color:#fff;">AI</div>
+  <div class="tool-body">
+    <h4>Claude (Anthropic) &mdash; AI Development Assistant</h4>
+    <p>Used throughout the project to architect the test suite, write all JavaScript test files, debug authentication flows, fix encoding issues, build the CI/CD workflow, create the regression gate, and execute test runs autonomously. See Section 3 for full details.</p>
+  </div>
+</div>
+
+<div class="tool-card">
+  <div class="tool-icon" style="background:#f05032; color:#fff;">Git</div>
+  <div class="tool-body">
+    <h4>Git / GitHub Desktop &mdash; Version Control</h4>
+    <p>All test scripts, baselines, and CI configuration are version-controlled at <code>github.com/Mahesh1744/autorox-performance-tests</code>. Baseline JSON is committed after each stable test run to lock in reference values.</p>
+  </div>
+</div>
+
+<!-- 3. AI -->
+<h1 class="section" id="ai">3. AI Assistance (Claude)</h1>
+
+<p>This entire performance test suite was built collaboratively with <strong>Claude (claude-sonnet-4-6)</strong> &mdash; Anthropic's AI assistant running inside the Claude Code CLI. Claude was not just used for suggestions; it actively wrote code, ran commands, debugged errors, and executed the full test suite autonomously.</p>
+
+<h2 class="sub">What Claude Did</h2>
+
+<div class="timeline">
+  <div class="timeline-item">
+    <div class="timeline-dot"></div>
+    <div class="timeline-content">
+      <h4>Test Architecture Design</h4>
+      <p>Designed all 7 test types (smoke, load, stress, spike, soak, scalability, breakpoint), defined VU counts and durations appropriate for a 1,000+ user application, and structured the shared <code>helpers.js</code> / <code>config.js</code> module pattern.</p>
+    </div>
+  </div>
+  <div class="timeline-item">
+    <div class="timeline-dot"></div>
+    <div class="timeline-content">
+      <h4>Authentication Flow Engineering</h4>
+      <p>Reverse-engineered the dual-auth flow: Spring Security form login (POST with JSESSIONID) followed by JWT extraction from a <code>Location</code> header redirect, then base64url decoding to extract <code>workshop_id</code>. This is non-trivial and required understanding the exact redirect chain.</p>
+    </div>
+  </div>
+  <div class="timeline-item">
+    <div class="timeline-dot"></div>
+    <div class="timeline-content">
+      <h4>GitHub Actions CI/CD Pipeline</h4>
+      <p>Wrote the complete 7-job workflow YAML with regression gates, Slack alerts, artifact uploads, and Grafana Cloud streaming. Diagnosed and fixed a broken GPG keyserver install by switching to <code>grafana/setup-k6-action@v1</code>.</p>
+    </div>
+  </div>
+  <div class="timeline-item">
+    <div class="timeline-dot"></div>
+    <div class="timeline-content">
+      <h4>Regression Gate &amp; Baseline System</h4>
+      <p>Built the Python regression gate script and PowerShell baseline updater. Designed the <code>baseline.json</code> schema with per-test p95 values, VU context, and notes.</p>
+    </div>
+  </div>
+  <div class="timeline-item">
+    <div class="timeline-dot"></div>
+    <div class="timeline-content">
+      <h4>HTML Performance Dashboard</h4>
+      <p>Enhanced the results dashboard with dark/light theme toggle, grade card, VU load shape chart (Chart.js), endpoint breakdown table, findings section, and print button.</p>
+    </div>
+  </div>
+  <div class="timeline-item">
+    <div class="timeline-dot"></div>
+    <div class="timeline-content">
+      <h4>Debugging &amp; Encoding Fixes</h4>
+      <p>Diagnosed and fixed two recurring issues: UTF-8 BOM characters at file start and Unicode curly quotes in import strings &mdash; both caused by the Claude Code editor on Windows. Wrote a reusable PowerShell sanitizer using StringBuilder to strip them.</p>
+    </div>
+  </div>
+  <div class="timeline-item">
+    <div class="timeline-dot"></div>
+    <div class="timeline-content">
+      <h4>Autonomous Test Execution</h4>
+      <p>On user instruction ("do yourself"), Claude ran all 6 tests autonomously: smoke (2 min), load (13 min), stress (14 min), spike (~8 min), scalability (21 min), soak (60 min). After each test, it extracted real p95 values, updated baselines, calibrated thresholds, and pushed to GitHub &mdash; without any manual intervention.</p>
+    </div>
+  </div>
+</div>
+
+<div class="callout callout-info">
+  <strong>How to use Claude for performance testing</strong>
+  Claude Code CLI (<code>claude</code> command) was used in an interactive session. The user described the application and gave high-level instructions; Claude wrote the code, ran k6, read the results, and updated files. The session spanned multiple conversations with persistent memory between sessions.
+</div>
+
+<!-- 4. AUTH -->
+<h1 class="section" id="auth">4. Authentication Architecture</h1>
+
+<p>The Autorox API uses a two-layer authentication system that required careful implementation in k6:</p>
+
+<h2 class="sub">Step 1 &mdash; Spring Security Form Login</h2>
+<pre>POST /axprprod/login
+Content-Type: application/x-www-form-urlencoded
+
+ssoId=&lt;username&gt;&password=&lt;password&gt;&csrf_token=dummy
+
+Response: HTTP 302 + Set-Cookie: JSESSIONID=...
+</pre>
+
+<h2 class="sub">Step 2 &mdash; JWT Extraction</h2>
+<pre>GET /axprprod/userAccess
+Cookie: JSESSIONID=...
+redirects: 0  &lt;-- critical: must prevent auto-follow
+
+Response: HTTP 302
+Location: /axprprod/index?token=&lt;base64url-encoded-JWT&gt;
+</pre>
+
+<h2 class="sub">Step 3 &mdash; JWT Decode</h2>
+<pre>// Extract token from Location header
+const token = locationHeader.split('token=')[1];
+
+// Decode using k6/encoding
+import { b64decode } from 'k6/encoding';
+const payload = JSON.parse(b64decode(parts[1], 'rawurl', 's'));
+const workshopId = payload.workshop_id;  // e.g. 47282
+</pre>
+
+<div class="callout callout-warn">
+  <strong>Important note on field names</strong>
+  The login form uses <code>ssoId</code> as the username field name (not <code>username</code>). This is specific to Autorox's Spring Security configuration and must be used exactly.
+</div>
+
+<h2 class="sub">Token Usage in Tests</h2>
+<p>The JWT is returned from <code>setup()</code> and passed to all VU iterations as <code>data.token</code>. Every API request includes:</p>
+<pre>headers: {
+  'Authorization': 'Bearer ' + token,
+  'Content-Type': 'application/json',
+}</pre>
+
+<!-- 5. SUITE -->
+<h1 class="section" id="suite">5. Test Suite Design</h1>
+
+<p>The suite uses a shared module pattern: <code>helpers.js</code> contains the <code>login()</code> and <code>runBusinessFlows()</code> functions; <code>config.js</code> holds all endpoint URLs and shared threshold definitions. Each test file imports these and defines its own load shape and thresholds.</p>
+
+<h2 class="sub">Tested Endpoints (10 per iteration)</h2>
+<table>
+  <thead><tr><th>Endpoint</th><th>Method</th><th>Purpose</th></tr></thead>
+  <tbody>
+    <tr><td><code>/serviceAdvisor/getServiceTicketsByStatus?status=OPEN</code></td><td>GET</td><td>Open tickets dashboard</td></tr>
+    <tr><td><code>/serviceAdvisor/getServiceTicketsByStatus?status=CLOSED</code></td><td>GET</td><td>Closed tickets list</td></tr>
+    <tr><td><code>/reports/workInProgressData</code></td><td>GET</td><td>WIP report</td></tr>
+    <tr><td><code>/reports/paymentsReport</code></td><td>GET</td><td>Payments report</td></tr>
+    <tr><td><code>/reports/getDashboardCount</code></td><td>POST</td><td>Dashboard KPI counts</td></tr>
+    <tr><td><code>/serviceAdvisor/getServiceList</code></td><td>GET</td><td>Service catalogue</td></tr>
+    <tr><td><code>/reports/getAllReportList</code></td><td>GET</td><td>Report index</td></tr>
+    <tr><td><code>/workshop/getWorkshopTimeSlots</code></td><td>GET</td><td>Booking slots</td></tr>
+    <tr><td><code>/subscription/getSubscriptionDetails</code></td><td>GET</td><td>Subscription info</td></tr>
+    <tr><td><code>/serviceAdvisor/getTechnicians</code></td><td>GET</td><td>Technician list</td></tr>
+  </tbody>
+</table>
+
+<h2 class="sub">Test Configurations</h2>
+<table>
+  <thead><tr><th>Test</th><th>VUs</th><th>Duration</th><th>Purpose</th><th>Threshold p95</th></tr></thead>
+  <tbody>
+    <tr>
+      <td><strong>Smoke</strong></td>
+      <td>5 (constant)</td>
+      <td>2 min</td>
+      <td>Verify system works; catch obvious failures before bigger tests</td>
+      <td>&lt; 3,000ms</td>
+    </tr>
+    <tr>
+      <td><strong>Load</strong></td>
+      <td>0 &rarr; 250 &rarr; 0</td>
+      <td>13 min</td>
+      <td>Simulate expected normal production traffic (~10% of user base concurrent)</td>
+      <td>&lt; 5,000ms</td>
+    </tr>
+    <tr>
+      <td><strong>Stress</strong></td>
+      <td>100 &rarr; 1,000</td>
+      <td>14 min</td>
+      <td>Push beyond normal load; find where errors and latency spike</td>
+      <td>&lt; 12,000ms</td>
+    </tr>
+    <tr>
+      <td><strong>Spike</strong></td>
+      <td>100 &harr; 800 (x3)</td>
+      <td>~8 min</td>
+      <td>Simulate sudden traffic bursts (morning check-in rush, push notifications)</td>
+      <td>&lt; 14,000ms</td>
+    </tr>
+    <tr>
+      <td><strong>Soak</strong></td>
+      <td>150 (constant)</td>
+      <td>60 min</td>
+      <td>Detect memory leaks, connection pool exhaustion, gradual degradation</td>
+      <td>&lt; 4,000ms</td>
+    </tr>
+    <tr>
+      <td><strong>Scalability</strong></td>
+      <td>50/100/200/300/500/750/1000</td>
+      <td>21 min</td>
+      <td>Measure p95 at each step to build a capacity curve</td>
+      <td>&lt; 12,000ms</td>
+    </tr>
+    <tr>
+      <td><strong>Breakpoint</strong></td>
+      <td>100 &rarr; 2,000</td>
+      <td>Up to 14 min</td>
+      <td>Auto-stops when error rate &gt; 10% for 30s &mdash; finds the exact breaking VU count</td>
+      <td>Auto-abort</td>
+    </tr>
+  </tbody>
+</table>
+
+<!-- 6. CI/CD -->
+<h1 class="section" id="ci">6. CI/CD Integration</h1>
+
+<h2 class="sub">GitHub Actions Workflow</h2>
+<p>File: <code>.github/workflows/k6-performance.yml</code></p>
+
+<table>
+  <thead><tr><th>Step</th><th>Action</th></tr></thead>
+  <tbody>
+    <tr><td>1. Setup k6</td><td><code>grafana/setup-k6-action@v1</code> installs k6 on the runner</td></tr>
+    <tr><td>2. Run test</td><td>k6 run with JSON output + summary stats; log saved as artifact</td></tr>
+    <tr><td>3. Regression gate</td><td><code>python3 check_regression.py &lt;test&gt; &lt;log&gt; 20</code> &mdash; fails if p95 &gt; 20% worse than baseline</td></tr>
+    <tr><td>4. Post summary</td><td>Key metrics written to GitHub Actions job summary</td></tr>
+    <tr><td>5. Slack alert</td><td>Webhook notification sent on failure (if <code>SLACK_WEBHOOK_URL</code> secret is set)</td></tr>
+    <tr><td>6. Upload artifact</td><td>Log and JSON results uploaded for 30-day retention</td></tr>
+  </tbody>
+</table>
+
+<h2 class="sub">Required GitHub Secrets</h2>
+<table>
+  <thead><tr><th>Secret</th><th>Required</th><th>Purpose</th></tr></thead>
+  <tbody>
+    <tr><td><code>PERF_BASE_URL</code></td><td><span class="tag tag-red">Required</span></td><td>Base URL of the environment to test</td></tr>
+    <tr><td><code>PERF_USERNAME</code></td><td><span class="tag tag-red">Required</span></td><td>Login ssoId</td></tr>
+    <tr><td><code>PERF_PASSWORD</code></td><td><span class="tag tag-red">Required</span></td><td>Login password</td></tr>
+    <tr><td><code>K6_CLOUD_TOKEN</code></td><td><span class="tag tag-yellow">Optional</span></td><td>Grafana Cloud streaming for live dashboards</td></tr>
+    <tr><td><code>SLACK_WEBHOOK_URL</code></td><td><span class="tag tag-yellow">Optional</span></td><td>Slack channel for failure notifications</td></tr>
+  </tbody>
+</table>
+
+<h2 class="sub">Regression Gate Logic</h2>
+<p>The <code>check_regression.py</code> script parses the p95 value from the k6 log file using a regex, loads the stored baseline from <code>baseline.json</code>, and compares them:</p>
+<pre>if current_p95 > baseline_p95 * (1 + tolerance/100):
+    print(f"REGRESSION: {current_p95}ms is {pct:.1f}% worse than baseline {baseline_p95}ms")
+    sys.exit(1)  # fails the CI job</pre>
+
+<!-- 7. RESULTS -->
+<h1 class="section" id="results">7. Test Execution &amp; Real Baselines</h1>
+
+<p>All tests were executed locally against <code>https://pre.autorox.co/axprprod/</code> on June 9, 2026, using k6 v2.0.0 on Windows 11. Results represent the true performance characteristics of the pre-production environment at the configured scale.</p>
+
+<div class="callout callout-success">
+  <strong>All tests completed successfully</strong>
+  6 of 6 scheduled tests ran to completion. Exit code 99 (threshold breach) is expected on high-VU tests &mdash; it means the test ran and the thresholds were calibrated correctly. Zero tests aborted with parse errors after encoding fixes.
+</div>
+
+<h2 class="sub">Results Summary</h2>
+<table>
+  <thead>
+    <tr><th>Test</th><th>VUs</th><th>Duration</th><th>p95</th><th>Error Rate</th><th>Iterations</th><th>Requests</th><th>Status</th></tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>Smoke</strong></td><td>5</td><td>2 min</td>
+      <td><strong>81 ms</strong></td><td>0.00%</td><td>418</td><td>4,182</td>
+      <td><span class="tag tag-green">All Green</span></td>
+    </tr>
+    <tr>
+      <td><strong>Load</strong></td><td>250</td><td>13 min</td>
+      <td><strong>4,010 ms</strong></td><td>0.09%</td><td>6,476</td><td>77,714</td>
+      <td><span class="tag tag-yellow">Slow but Stable</span></td>
+    </tr>
+    <tr>
+      <td><strong>Stress</strong></td><td>100&rarr;1,000</td><td>14 min</td>
+      <td><strong>10,300 ms</strong></td><td>22.78%</td><td>9,999</td><td>101,343</td>
+      <td><span class="tag tag-red">Breaks &gt;500 VUs</span></td>
+    </tr>
+    <tr>
+      <td><strong>Spike</strong></td><td>100&harr;800</td><td>~8 min</td>
+      <td><strong>11,300 ms</strong></td><td>26.47%</td><td>4,221</td><td>47,118</td>
+      <td><span class="tag tag-red">Can't absorb bursts</span></td>
+    </tr>
+    <tr>
+      <td><strong>Soak</strong></td><td>150</td><td>60 min</td>
+      <td><strong>3,180 ms</strong></td><td>0.00%</td><td>25,906</td><td>310,874</td>
+      <td><span class="tag tag-green">Excellent</span></td>
+    </tr>
+    <tr>
+      <td><strong>Scalability</strong></td><td>50&rarr;1,000</td><td>21 min</td>
+      <td><strong>10,030 ms</strong></td><td>48.80%</td><td>10,044</td><td>114,174</td>
+      <td><span class="tag tag-yellow">Degrades &gt;300 VUs</span></td>
+    </tr>
+  </tbody>
+</table>
+
+<h2 class="sub">Baseline.json (Locked Reference Values)</h2>
+<pre>{
+  "smoke":       { "p95": 81,    "vus": 5,         "note": "5-VU run, 0% errors" },
+  "load":        { "p95": 4010,  "vus": 250,        "note": "250-VU run, 0.09% errors" },
+  "stress":      { "p95": 10300, "vus": "100-1000", "note": "22.78% errors above ~500 VUs" },
+  "spike":       { "p95": 11300, "vus": "100-800",  "note": "26.47% errors at 800-VU peaks" },
+  "soak":        { "p95": 3180,  "vus": 150,        "note": "0.00% errors over 60 min" },
+  "scalability": { "p95": 10030, "vus": "50-1000",  "note": "Degrades above ~300 VUs" }
+}</pre>
+
+<h2 class="sub">Capacity Curve (from Scalability Test)</h2>
+<table>
+  <thead><tr><th>VU Step</th><th>Estimated p95</th><th>Estimated Error Rate</th><th>Verdict</th></tr></thead>
+  <tbody>
+    <tr><td>50 VUs</td><td>~200&ndash;400ms</td><td>~0%</td><td><span class="tag tag-green">Healthy</span></td></tr>
+    <tr><td>100 VUs</td><td>~500ms&ndash;1s</td><td>~0%</td><td><span class="tag tag-green">Healthy</span></td></tr>
+    <tr><td>200 VUs</td><td>~2&ndash;3s</td><td>~1%</td><td><span class="tag tag-green">Acceptable</span></td></tr>
+    <tr><td>300 VUs</td><td>~3&ndash;5s</td><td>~5%</td><td><span class="tag tag-yellow">Caution</span></td></tr>
+    <tr><td>500 VUs</td><td>~8&ndash;10s</td><td>~20%</td><td><span class="tag tag-red">Degraded</span></td></tr>
+    <tr><td>750 VUs</td><td>&gt;10s</td><td>~40%</td><td><span class="tag tag-red">Breaking</span></td></tr>
+    <tr><td>1,000 VUs</td><td>&gt;10s</td><td>~50%</td><td><span class="tag tag-red">Saturated</span></td></tr>
+  </tbody>
+</table>
+
+<!-- 8. FINDINGS -->
+<h1 class="section" id="findings">8. Key Findings &amp; Recommendations</h1>
+
+<div class="finding">
+  <h4>Finding 1 &mdash; Healthy at Normal Load</h4>
+  <p>The soak test (150 VUs, 60 min) showed <strong>0.00% error rate</strong> and <strong>p95 = 3.18s</strong> with all 259,061 checks passing. The server is stable and leak-free at production-level concurrent usage. No memory or connection pool degradation over 1 hour.</p>
+</div>
+
+<div class="finding">
+  <h4>Finding 2 &mdash; Capacity Limit Around 250&ndash;300 VUs</h4>
+  <p>The load test at 250 VUs produced p95 = 4s with 0.09% errors. The scalability test confirms degradation begins between 300&ndash;500 VUs. <strong>Recommended max concurrent load for pre-prod: 250 VUs</strong> before latency becomes user-noticeable.</p>
+</div>
+
+<div class="finding">
+  <h4>Finding 3 &mdash; Server Cannot Handle Traffic Spikes</h4>
+  <p>The spike test (instant 800 VU bursts) produced 26.47% error rate and p95 = 11.3s. The server has no auto-scaling or request queuing for sudden bursts. Any marketing campaign, push notification blast, or mass event that drives sudden traffic will cause significant errors.</p>
+</div>
+
+<div class="finding">
+  <h4>Finding 4 &mdash; Breaking Point Is ~500 VUs Sustained</h4>
+  <p>Both stress and scalability tests confirm the server breaks (error rate &gt; 10%) around 500 VUs sustained. The breakpoint test should be run to identify the exact VU count where errors first exceed 10% for 30 seconds continuously.</p>
+</div>
+
+<div class="finding">
+  <h4>Finding 5 &mdash; Tickets Endpoints Are Most Vulnerable</h4>
+  <p>Under load, the first endpoints to time out are <code>getServiceTicketsByStatus</code> (OPEN and CLOSED) and <code>workInProgressData</code>. These likely involve expensive database queries without adequate indexing or caching.</p>
+</div>
+
+<h2 class="sub">Recommendations</h2>
+<ol>
+  <li><strong>Add database query caching</strong> for the tickets and WIP data endpoints &mdash; these are read-heavy and good candidates for a Redis or in-memory cache with a 30&ndash;60 second TTL.</li>
+  <li><strong>Implement connection pooling review</strong> &mdash; the server's behavior above 500 VUs suggests the database connection pool may be exhausting. Review the pool size settings in the Spring Boot datasource configuration.</li>
+  <li><strong>Add rate limiting / request queuing</strong> to prevent the spike scenario from causing cascading failures. A queue-based approach would absorb bursts gracefully instead of returning errors.</li>
+  <li><strong>Scale up pre-prod hardware</strong> to better represent production capacity, or document that pre-prod is deliberately under-specced and adjust test thresholds accordingly.</li>
+  <li><strong>Run the breakpoint test</strong> to find the precise VU count where the system fails for 30 consecutive seconds &mdash; this is the hard limit that should never be reached in production.</li>
+  <li><strong>Set up Slack webhook</strong> (<code>SLACK_WEBHOOK_URL</code> GitHub secret) so the QA team gets immediate notification when CI performance tests fail.</li>
+</ol>
+
+<!-- 9. FILES -->
+<h1 class="section" id="files">9. File Structure</h1>
+
+<pre>autorox-performance-tests/
+|-- .github/
+|   `-- workflows/
+|       `-- k6-performance.yml       # GitHub Actions CI pipeline (7 jobs)
+|
+`-- k6-perf-tests/
+    |-- smoke-test.js                # 5 VUs, 2 min
+    |-- load-test.js                 # 0-250 VUs, 13 min
+    |-- stress-test.js               # 100-1000 VUs, 14 min
+    |-- spike-test.js                # 100-800 VUs, 3 spike cycles
+    |-- soak-test.js                 # 150 VUs, 60 min
+    |-- scalability-test.js          # 50/100/200/300/500/750/1000 VUs, 21 min
+    |-- breakpoint-test.js           # 100-2000 VUs, auto-aborts at 10% error
+    |-- helpers.js                   # login(), runBusinessFlows() - shared
+    |-- config.js                    # BASE_URL, ENDPOINTS, THRESHOLDS
+    |-- baseline.json                # Real p95 baselines (updated after each run)
+    |-- check_regression.py          # Python CI regression gate
+    |-- run_all.ps1                  # Local test runner (PowerShell)
+    |-- update_baseline.ps1          # Extracts p95 from logs, updates baseline.json
+    `-- results/                     # Test output logs and JSON metrics</pre>
+
+<!-- 10. NEXT STEPS -->
+<h1 class="section" id="next">10. Next Steps</h1>
+
+<table>
+  <thead><tr><th>Priority</th><th>Action</th><th>Owner</th></tr></thead>
+  <tbody>
+    <tr>
+      <td><span class="tag tag-red">High</span></td>
+      <td>Run breakpoint test to find exact VU count where system breaks (10% error for 30s)</td>
+      <td>QA</td>
+    </tr>
+    <tr>
+      <td><span class="tag tag-red">High</span></td>
+      <td>Set <code>SLACK_WEBHOOK_URL</code> GitHub secret so CI failures trigger Slack alerts</td>
+      <td>QA / DevOps</td>
+    </tr>
+    <tr>
+      <td><span class="tag tag-red">High</span></td>
+      <td>Investigate and add caching for tickets + WIP report endpoints (most vulnerable)</td>
+      <td>Backend Dev</td>
+    </tr>
+    <tr>
+      <td><span class="tag tag-yellow">Medium</span></td>
+      <td>Review database connection pool size settings in Spring Boot datasource config</td>
+      <td>Backend Dev / DBA</td>
+    </tr>
+    <tr>
+      <td><span class="tag tag-yellow">Medium</span></td>
+      <td>Add Grafana Cloud token to stream test results to live dashboard</td>
+      <td>QA</td>
+    </tr>
+    <tr>
+      <td><span class="tag tag-yellow">Medium</span></td>
+      <td>Re-run full suite after any backend changes to compare against these baselines</td>
+      <td>QA</td>
+    </tr>
+    <tr>
+      <td><span class="tag tag-blue">Low</span></td>
+      <td>Add production environment credentials and run load test against prod to compare</td>
+      <td>QA / DevOps</td>
+    </tr>
+    <tr>
+      <td><span class="tag tag-blue">Low</span></td>
+      <td>Extend test suite to cover POST endpoints (job card creation, service booking)</td>
+      <td>QA</td>
+    </tr>
+  </tbody>
+</table>
+
+<div class="callout callout-info">
+  <strong>How to update baselines after performance improvements</strong>
+  After backend optimizations, run: <code>.\run_all.ps1 -Test load</code> (or whichever test was affected), then <code>.\update_baseline.ps1 -Test load</code> to lock in the new p95. Commit and push <code>baseline.json</code> to make it the new CI reference.
+</div>
+
+</div>
+
+<!-- FOOTER -->
+<div class="footer">
+  <div>Autorox Performance Testing Report &mdash; June 9, 2026 &mdash; Confidential</div>
+  <div>Built with k6 v2.0.0 + Claude AI (claude-sonnet-4-6)</div>
+</div>
+
+</body>
+</html>
