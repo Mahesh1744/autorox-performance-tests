@@ -21,9 +21,9 @@
                   "note":  "Updated 2026-06-09 from actual 800-VU spike run (26.47% errors at peak, 4221 iters)"
               },
     "soak":  {
-                 "p95":  1030,
+                 "p95":  3180,
                  "vus":  150,
-                 "note":  "Updated 2026-06-09 from actual run"
+                 "note":  "Updated 2026-06-09 from actual 60-min run (0.00% errors, 100% checks, 310874 reqs, 8.8 GB)"
              },
     "scalability":  {
                         "p95":  10030,
