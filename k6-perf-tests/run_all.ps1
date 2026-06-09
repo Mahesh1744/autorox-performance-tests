@@ -13,7 +13,7 @@
 #   Set $env:K6_CLOUD_TOKEN before running to stream results live.
 # ============================================================
 param(
-    [ValidateSet('smoke','load','stress','spike','soak','scalability','all')]
+    [ValidateSet('smoke','load','stress','spike','soak','scalability','breakpoint','all')]
     [string]$Test = 'all'
 )
 
@@ -71,14 +71,21 @@ $Tests = @{
     spike       = 'spike-test.js'
     soak        = 'soak-test.js'
     scalability = 'scalability-test.js'
+    breakpoint  = 'breakpoint-test.js'
 }
 
 if ($Test -eq 'all') {
-    # Run in recommended order: smoke first to validate, then progressively harder
+    # Run in recommended order: smoke first, then progressively harder
+    # Breakpoint is excluded from 'all' — run it separately when needed
     foreach ($key in @('smoke','load','stress','spike','soak','scalability')) {
         Run-K6 -Name $key -File $Tests[$key]
     }
 } else {
+    if ($Test -eq 'breakpoint') {
+        Write-Host ""
+        Write-Host "  NOTE: Breakpoint test auto-stops when error rate > 10%." -ForegroundColor Yellow
+        Write-Host "  This is expected behaviour — look for the VU count at abort." -ForegroundColor Yellow
+    }
     Run-K6 -Name $Test -File $Tests[$Test]
 }
 

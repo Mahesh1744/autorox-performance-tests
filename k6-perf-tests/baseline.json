@@ -1,0 +1,9 @@
+{
+  "_readme": "Update p95 values after each stable scaled run. null = no baseline yet (check skipped).",
+  "smoke":       { "p95": 200,  "note": "Estimated for 5 VUs — update after first run" },
+  "load":        { "p95": null, "note": "No baseline yet for 250 VUs — run first, then update" },
+  "stress":      { "p95": null, "note": "No baseline yet for 100-1000 VUs — run first, then update" },
+  "spike":       { "p95": null, "note": "No baseline yet for 100-800 VUs — run first, then update" },
+  "soak":        { "p95": null, "note": "No baseline yet for 150 VUs — run first, then update" },
+  "scalability": { "p95": null, "note": "No baseline yet for 50-1000 VUs — run first, then update" }
+}
