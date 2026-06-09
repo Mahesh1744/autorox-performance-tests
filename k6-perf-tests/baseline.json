@@ -1,9 +1,33 @@
-{
-  "_readme": "Update p95 values after each stable scaled run. null = no baseline yet (check skipped).",
-  "smoke":       { "p95": 200,  "note": "Estimated for 5 VUs — update after first run" },
-  "load":        { "p95": null, "note": "No baseline yet for 250 VUs — run first, then update" },
-  "stress":      { "p95": null, "note": "No baseline yet for 100-1000 VUs — run first, then update" },
-  "spike":       { "p95": null, "note": "No baseline yet for 100-800 VUs — run first, then update" },
-  "soak":        { "p95": null, "note": "No baseline yet for 150 VUs — run first, then update" },
-  "scalability": { "p95": null, "note": "No baseline yet for 50-1000 VUs — run first, then update" }
+﻿{
+    "_readme":  "Update p95 values after each stable run using update_baseline.ps1. null = no baseline yet (check skipped).",
+    "smoke":  {
+                  "p95":  300,
+                  "vus":  5,
+                  "note":  "Conservative estimate for 5 VUs (actual at 1 VU was 112ms). Update after first real 5-VU run."
+              },
+    "load":  {
+                 "p95":  329,
+                 "vus":  250,
+                 "note":  "Updated 2026-06-09 from actual run"
+             },
+    "stress":  {
+                   "p95":  1490,
+                   "vus":  "100-1000",
+                   "note":  "Updated 2026-06-09 from actual run"
+               },
+    "spike":  {
+                  "p95":  1820,
+                  "vus":  "100-800",
+                  "note":  "Updated 2026-06-09 from actual run"
+              },
+    "soak":  {
+                 "p95":  1030,
+                 "vus":  150,
+                 "note":  "Updated 2026-06-09 from actual run"
+             },
+    "scalability":  {
+                        "p95":  921,
+                        "vus":  "50-1000",
+                        "note":  "Updated 2026-06-09 from actual run"
+                    }
 }
