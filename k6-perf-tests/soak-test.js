@@ -4,7 +4,7 @@
  *           performance degradation under sustained production-level load.
  * Pattern : 150 VUs for 60 minutes (1 hour).
  *   0 -> 150 VUs  (3 min ramp-up)
- *   150 VUs       (55 min steady — represents ~3% of 5K user base concurrent)
+ *   150 VUs       (55 min steady - represents ~3% of 5K user base concurrent)
  *   150 -> 0 VUs  (2 min ramp-down)
  * Total   : 60 min
  * Pass    : p95 < 3 s throughout, error rate < 1%.

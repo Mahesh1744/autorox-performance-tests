@@ -1,6 +1,6 @@
 /**
  * SPIKE TEST
- * Purpose : Simulate sudden traffic bursts — morning workshop check-in rush,
+ * Purpose : Simulate sudden traffic bursts - morning workshop check-in rush,
  *           service camp events, or mass notifications sending users to the app.
  * Pattern : 3 spike cycles.
  *   Baseline  : 100 VUs  (1.5 min)  <- normal concurrent load

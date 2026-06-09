@@ -1,14 +1,14 @@
 ﻿{
     "_readme":  "Update p95 values after each stable run using update_baseline.ps1. null = no baseline yet (check skipped).",
     "smoke":  {
-                  "p95":  300,
+                  "p95":  81,
                   "vus":  5,
-                  "note":  "Conservative estimate for 5 VUs (actual at 1 VU was 112ms). Update after first real 5-VU run."
+                  "note":  "Updated 2026-06-09 from actual 5-VU run (p95=80.75ms, 0% errors)"
               },
     "load":  {
-                 "p95":  329,
+                 "p95":  4010,
                  "vus":  250,
-                 "note":  "Updated 2026-06-09 from actual run"
+                 "note":  "Updated 2026-06-09 from actual 250-VU run (6476 iters, 0.09% errors, 99 req/s)"
              },
     "stress":  {
                    "p95":  1490,

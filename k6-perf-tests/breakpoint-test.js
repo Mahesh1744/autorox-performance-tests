@@ -11,7 +11,7 @@
  *   Ramp-down: 0 VUs (1 min)
  * Total   : up to 14 min (usually stops early at breakpoint)
  * Output  : The VU count at time of abort = system breakpoint.
- * Pass    : Test always "fails" — this is expected. Goal is the data, not pass/fail.
+ * Pass    : Test always "fails" - this is expected. Goal is the data, not pass/fail.
  */
 import { check, sleep } from 'k6';
 import { Rate, Trend } from 'k6/metrics';

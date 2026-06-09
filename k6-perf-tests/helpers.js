@@ -12,7 +12,7 @@ import { BASE_URL, CREDENTIALS, ENDPOINTS } from './config.js';
  * Returns { token, workshopId }
  */
 export function login() {
-  // Step 1 — form login
+  // Step 1 - form login
   const loginRes = http.post(
     `${BASE_URL}/login`,
     `ssoId=${CREDENTIALS.ssoId}&password=${CREDENTIALS.password}&csrf_token=dummy`,
@@ -25,11 +25,11 @@ export function login() {
 
   const jar = loginRes.cookies['JSESSIONID'];
   if (!jar || jar.length === 0) {
-    throw new Error(`Login failed — status ${loginRes.status}, no JSESSIONID`);
+    throw new Error(`Login failed - status ${loginRes.status}, no JSESSIONID`);
   }
   const jsessionid = jar[0].value;
 
-  // Step 2 — follow to /userAccess without chasing the second redirect so we
+  // Step 2 - follow to /userAccess without chasing the second redirect so we
   // can read the Location header that contains the JWT token
   const accessRes = http.get(
     `${BASE_URL}/userAccess`,
@@ -43,7 +43,7 @@ export function login() {
   }
   const token = tokenMatch[1];
 
-  // Step 3 — decode JWT payload (middle segment) to get workshopId
+  // Step 3 - decode JWT payload (middle segment) to get workshopId
   const workshopId = extractWorkshopId(token);
 
   return { token, workshopId };
@@ -93,12 +93,12 @@ export function runBusinessFlows(token, workshopId) {
 
   const results = [];
 
-  // 1. Tickets by status – OPEN
+  // 1. Tickets by status - OPEN
   results.push(http.get(
     `${BASE_URL}${ENDPOINTS.ticketsByStatus}?status=OPEN&pageNo=0&workShopId=${wid}`, p
   ));
 
-  // 2. Tickets by status – CLOSED
+  // 2. Tickets by status - CLOSED
   results.push(http.get(
     `${BASE_URL}${ENDPOINTS.ticketsByStatus}?status=CLOSED&pageNo=0&workShopId=${wid}`, p
   ));

@@ -1,4 +1,4 @@
-﻿/**
+/**
  * STRESS TEST
  * Purpose : Push system beyond normal load to find the breaking point.
  *           Observe at which VU count errors spike or response time degrades.
@@ -8,10 +8,10 @@
  *   Stage 3:  500 VUs
  *   Stage 4:  750 VUs
  *   Stage 5: 1000 VUs
- *   Stage 6: 1000 VUs (hold — observe sustained stress)
+ *   Stage 6: 1000 VUs (hold - observe sustained stress)
  *   Ramp-down: 0 VUs (2 min)
  * Total   : 14 min
- * Pass    : p95 < 8 s, error rate < 10% (lenient — goal is to measure degradation)
+ * Pass    : p95 < 8 s, error rate < 10% (lenient - goal is to measure degradation)
  */
 import { check, sleep, group } from 'k6';
 import { Trend, Rate, Counter, Gauge } from 'k6/metrics';
