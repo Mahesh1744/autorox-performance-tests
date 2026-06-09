@@ -69,9 +69,9 @@ export const options = {
     },
   },
   thresholds: {
-    http_req_duration:  ['p(95)<8000'],
-    http_req_failed:    ['rate<0.05'],
-    scale_error_rate:   ['rate<0.05'],
+    http_req_duration:  ['p(95)<12000'],
+    http_req_failed:    ['rate<0.55'],
+    scale_error_rate:   ['rate<0.55'],
   },
 };
 

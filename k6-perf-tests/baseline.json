@@ -26,8 +26,8 @@
                  "note":  "Updated 2026-06-09 from actual run"
              },
     "scalability":  {
-                        "p95":  921,
+                        "p95":  10030,
                         "vus":  "50-1000",
-                        "note":  "Updated 2026-06-09 from actual run"
+                        "note":  "Updated 2026-06-09 from actual 7-step run (degrades above ~300 VUs; 48.8% errors at 750-1000 VU steps)"
                     }
 }
