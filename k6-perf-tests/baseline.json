@@ -1,4 +1,4 @@
-﻿{
+{
     "_readme":  "Update p95 values after each stable run using update_baseline.ps1. null = no baseline yet (check skipped). NOTE: baselines reflect GitHub Actions runner latency (US-east to Mumbai ~+180ms vs local).",
     "smoke":  {
                   "p95":  300,

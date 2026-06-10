@@ -56,7 +56,7 @@ def main():
         print(f"[regression] No baseline.json found — skipping check.")
         sys.exit(0)
 
-    with open(baseline_file) as f:
+    with open(baseline_file, encoding='utf-8-sig') as f:
         baseline = json.load(f)
 
     entry = baseline.get(test_name, {})
