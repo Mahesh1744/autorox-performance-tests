@@ -1,9 +1,9 @@
 ﻿{
-    "_readme":  "Update p95 values after each stable run using update_baseline.ps1. null = no baseline yet (check skipped).",
+    "_readme":  "Update p95 values after each stable run using update_baseline.ps1. null = no baseline yet (check skipped). NOTE: baselines reflect GitHub Actions runner latency (US-east to Mumbai ~+180ms vs local).",
     "smoke":  {
-                  "p95":  81,
+                  "p95":  300,
                   "vus":  5,
-                  "note":  "Updated 2026-06-09 from actual 5-VU run (p95=80.75ms, 0% errors)"
+                  "note":  "CI baseline: 269ms from GitHub Actions (US runner -> Mumbai server). Local was 81ms."
               },
     "load":  {
                  "p95":  4010,
