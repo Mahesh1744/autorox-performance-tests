@@ -49,7 +49,7 @@ jobs:
             --out json=k6-perf-tests/results/smoke_ci.json \
             --summary-trend-stats "avg,min,med,max,p(90),p(95),p(99)" \
             $CLOUD_OUT \
-            2>&1 | tee k6-perf-tests/results/smoke_ci.log
+            2>&1 | tee k6-perf-tests/results/smoke_ci.log || true
 
       - name: Regression Gate
         if: always()
@@ -121,7 +121,7 @@ jobs:
             --out json=k6-perf-tests/results/load_ci.json \
             --summary-trend-stats "avg,min,med,max,p(90),p(95),p(99)" \
             $CLOUD_OUT \
-            2>&1 | tee k6-perf-tests/results/load_ci.log
+            2>&1 | tee k6-perf-tests/results/load_ci.log || true
 
       - name: Regression Gate
         if: always()
@@ -193,7 +193,7 @@ jobs:
             --out json=k6-perf-tests/results/stress_ci.json \
             --summary-trend-stats "avg,min,med,max,p(90),p(95),p(99)" \
             $CLOUD_OUT \
-            2>&1 | tee k6-perf-tests/results/stress_ci.log
+            2>&1 | tee k6-perf-tests/results/stress_ci.log || true
 
       - name: Regression Gate
         if: always()
@@ -265,7 +265,7 @@ jobs:
             --out json=k6-perf-tests/results/spike_ci.json \
             --summary-trend-stats "avg,min,med,max,p(90),p(95),p(99)" \
             $CLOUD_OUT \
-            2>&1 | tee k6-perf-tests/results/spike_ci.log
+            2>&1 | tee k6-perf-tests/results/spike_ci.log || true
 
       - name: Regression Gate
         if: always()
@@ -338,7 +338,7 @@ jobs:
             --out json=k6-perf-tests/results/soak_ci.json \
             --summary-trend-stats "avg,min,med,max,p(90),p(95),p(99)" \
             $CLOUD_OUT \
-            2>&1 | tee k6-perf-tests/results/soak_ci.log
+            2>&1 | tee k6-perf-tests/results/soak_ci.log || true
 
       - name: Regression Gate
         if: always()
@@ -410,7 +410,7 @@ jobs:
             --out json=k6-perf-tests/results/scalability_ci.json \
             --summary-trend-stats "avg,min,med,max,p(90),p(95),p(99)" \
             $CLOUD_OUT \
-            2>&1 | tee k6-perf-tests/results/scalability_ci.log
+            2>&1 | tee k6-perf-tests/results/scalability_ci.log || true
 
       - name: Regression Gate
         if: always()
