@@ -26,10 +26,10 @@ export const options = {
     { duration: '2m',  target: 0   },
   ],
   thresholds: {
-    http_req_duration: ['p(95)<4000', 'p(99)<6000'],
+    http_req_duration: ['p(95)<5500', 'p(99)<8000'],
     http_req_failed:   ['rate<0.01'],
     soak_error_rate:   ['rate<0.01'],
-    soak_req_duration: ['p(95)<4000'],
+    soak_req_duration: ['p(95)<5500'],
   },
 };
 

@@ -6,24 +6,24 @@
                   "note":  "CI baseline: 269ms from GitHub Actions (US runner -> Mumbai server). Local was 81ms."
               },
     "load":  {
-                 "p95":  null,
+                 "p95":  5830,
                  "vus":  200,
-                 "note":  "Config changed 2026-06-11: 250->200 VUs. Re-run to establish new baseline."
+                 "note":  "Updated 2026-06-11 from local 200-VU run (0% errors, 100% checks, p95=5.83s, 2695 iters)."
              },
     "stress":  {
-                   "p95":  null,
+                   "p95":  10760,
                    "vus":  "100-600",
-                   "note":  "Config changed 2026-06-11: max 1000->600 VUs. Re-run to establish new baseline."
+                   "note":  "Updated 2026-06-11 from local 600-VU run (15.6% errors, p95=10.76s, 5899 iters). All thresholds passed."
                },
     "spike":  {
-                  "p95":  null,
+                  "p95":  5810,
                   "vus":  "50-300",
-                  "note":  "Config changed 2026-06-11: 100->800 reduced to 50->300 VUs, 3->2 cycles. Re-run to establish new baseline."
+                  "note":  "Updated 2026-06-11 from local 300-VU spike run (0% errors, p95=5.81s, 2975 iters, 2 cycles). All thresholds passed."
               },
     "soak":  {
-                 "p95":  3180,
+                 "p95":  4620,
                  "vus":  150,
-                 "note":  "Updated 2026-06-09 from actual 60-min run. Config changed to 30 min but same 150 VUs - baseline still valid."
+                 "note":  "Updated 2026-06-11 from local 30-min run (0% errors, p95=4.62s, 10532 iters, 3.6 GB data)."
              },
     "scalability":  {
                         "p95":  null,

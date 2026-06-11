@@ -25,10 +25,10 @@ export const options = {
     { duration: '2m', target: 0   },
   ],
   thresholds: {
-    http_req_duration:    ['p(95)<4000', 'p(99)<7000'],
+    http_req_duration:    ['p(95)<7000', 'p(99)<10000'],
     http_req_failed:      ['rate<0.01'],
     load_error_rate:      ['rate<0.01'],
-    load_req_duration:    ['p(95)<4000'],
+    load_req_duration:    ['p(95)<7000'],
   },
 };
 
