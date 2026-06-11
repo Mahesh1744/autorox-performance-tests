@@ -6,28 +6,28 @@
                   "note":  "CI baseline: 269ms from GitHub Actions (US runner -> Mumbai server). Local was 81ms."
               },
     "load":  {
-                 "p95":  4010,
-                 "vus":  250,
-                 "note":  "Updated 2026-06-09 from actual 250-VU run (6476 iters, 0.09% errors, 99 req/s)"
+                 "p95":  null,
+                 "vus":  200,
+                 "note":  "Config changed 2026-06-11: 250->200 VUs. Re-run to establish new baseline."
              },
     "stress":  {
-                   "p95":  13000,
-                   "vus":  "100-1000",
-                   "note":  "Updated 2026-06-11 from CI run (p95=12.71s, 29% errors at 1000 VUs). CI runner US->Mumbai adds latency vs local 10.3s."
+                   "p95":  null,
+                   "vus":  "100-600",
+                   "note":  "Config changed 2026-06-11: max 1000->600 VUs. Re-run to establish new baseline."
                },
     "spike":  {
-                  "p95":  11300,
-                  "vus":  "100-800",
-                  "note":  "Updated 2026-06-09 from actual 800-VU spike run (26.47% errors at peak, 4221 iters)"
+                  "p95":  null,
+                  "vus":  "50-300",
+                  "note":  "Config changed 2026-06-11: 100->800 reduced to 50->300 VUs, 3->2 cycles. Re-run to establish new baseline."
               },
     "soak":  {
                  "p95":  3180,
                  "vus":  150,
-                 "note":  "Updated 2026-06-09 from actual 60-min run (0.00% errors, 100% checks, 310874 reqs, 8.8 GB)"
+                 "note":  "Updated 2026-06-09 from actual 60-min run. Config changed to 30 min but same 150 VUs - baseline still valid."
              },
     "scalability":  {
-                        "p95":  10030,
-                        "vus":  "50-1000",
-                        "note":  "Updated 2026-06-09 from actual 7-step run (degrades above ~300 VUs; 48.8% errors at 750-1000 VU steps)"
+                        "p95":  null,
+                        "vus":  "25-500",
+                        "note":  "Config changed 2026-06-11: 50-1000 reduced to 25-500 VUs, 7->6 steps. Re-run to establish new baseline."
                     }
 }

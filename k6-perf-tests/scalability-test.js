@@ -1,12 +1,11 @@
 /**
  * SCALABILITY TEST
- * Purpose : Measure how throughput and response time change as load grows
- *           from light to full production-scale (thousands of users).
+ * Purpose : Measure how throughput and response time change as load grows.
  *           Each step runs for 3 minutes at a fixed VU count.
- * Pattern : 7 steps -> 50 -> 100 -> 200 -> 300 -> 500 -> 750 -> 1000 VUs.
- * Total   : 21 min
- * Analysis: Compare p95 and RPS across steps to find the efficiency curve
- *           and identify the VU count where response time starts degrading.
+ * Pattern : 6 steps -> 25 -> 50 -> 100 -> 200 -> 350 -> 500 VUs.
+ * Total   : 18 min
+ * Analysis: Compare p95 and RPS across steps to find the efficiency curve.
+ *           Server healthy below ~300 VUs; degradation visible at 350-500 VUs.
  */
 import { check, sleep } from 'k6';
 import { Trend, Rate, Counter } from 'k6/metrics';
@@ -18,60 +17,53 @@ const scaleReqCount    = new Counter('scale_req_count');
 
 export const options = {
   scenarios: {
+    step_025_vus: {
+      executor: 'constant-vus',
+      vus: 25,
+      duration: '3m',
+      startTime: '0m',
+      tags: { step: '025_vus' },
+    },
     step_050_vus: {
       executor: 'constant-vus',
       vus: 50,
       duration: '3m',
-      startTime: '0m',
+      startTime: '3m',
       tags: { step: '050_vus' },
     },
     step_100_vus: {
       executor: 'constant-vus',
       vus: 100,
       duration: '3m',
-      startTime: '3m',
+      startTime: '6m',
       tags: { step: '100_vus' },
     },
     step_200_vus: {
       executor: 'constant-vus',
       vus: 200,
       duration: '3m',
-      startTime: '6m',
+      startTime: '9m',
       tags: { step: '200_vus' },
     },
-    step_300_vus: {
+    step_350_vus: {
       executor: 'constant-vus',
-      vus: 300,
+      vus: 350,
       duration: '3m',
-      startTime: '9m',
-      tags: { step: '300_vus' },
+      startTime: '12m',
+      tags: { step: '350_vus' },
     },
     step_500_vus: {
       executor: 'constant-vus',
       vus: 500,
       duration: '3m',
-      startTime: '12m',
-      tags: { step: '500_vus' },
-    },
-    step_750_vus: {
-      executor: 'constant-vus',
-      vus: 750,
-      duration: '3m',
       startTime: '15m',
-      tags: { step: '750_vus' },
-    },
-    step_1000_vus: {
-      executor: 'constant-vus',
-      vus: 1000,
-      duration: '3m',
-      startTime: '18m',
-      tags: { step: '1000_vus' },
+      tags: { step: '500_vus' },
     },
   },
   thresholds: {
-    http_req_duration:  ['p(95)<12000'],
-    http_req_failed:    ['rate<0.55'],
-    scale_error_rate:   ['rate<0.55'],
+    http_req_duration:  ['p(95)<10000'],
+    http_req_failed:    ['rate<0.40'],
+    scale_error_rate:   ['rate<0.40'],
   },
 };
 

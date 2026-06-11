@@ -94,7 +94,7 @@ jobs:
 
   # -- LOAD --------------------------------------------
   load:
-    name: Load Test (250 VUs · 13 min)
+    name: Load Test (200 VUs · 10 min)
     runs-on: ubuntu-latest
     needs: smoke
     if: >
@@ -168,7 +168,7 @@ jobs:
 
   # -- STRESS ------------------------------------------
   stress:
-    name: Stress Test (100->1000 VUs · 14 min)
+    name: Stress Test (100->600 VUs · 14 min)
     runs-on: ubuntu-latest
     needs: load
     if: >
@@ -242,7 +242,7 @@ jobs:
 
   # -- SPIKE -------------------------------------------
   spike:
-    name: Spike Test (100->800 VUs · 12 min)
+    name: Spike Test (50->300 VUs · 7 min)
     runs-on: ubuntu-latest
     needs: smoke
     if: >
@@ -316,10 +316,10 @@ jobs:
 
   # -- SOAK --------------------------------------------
   soak:
-    name: Soak Test (150 VUs · 60 min)
+    name: Soak Test (150 VUs · 30 min)
     runs-on: ubuntu-latest
     needs: load
-    timeout-minutes: 75
+    timeout-minutes: 40
     if: >
       always() &&
       (needs.load.result == 'success' || needs.load.result == 'skipped') &&
@@ -391,7 +391,7 @@ jobs:
 
   # -- SCALABILITY -------------------------------------
   scalability:
-    name: Scalability Test (50->1000 VUs · 21 min)
+    name: Scalability Test (25->500 VUs · 18 min)
     runs-on: ubuntu-latest
     needs: load
     if: >

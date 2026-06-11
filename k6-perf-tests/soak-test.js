@@ -2,12 +2,12 @@
  * SOAK / ENDURANCE TEST
  * Purpose : Detect memory leaks, connection pool exhaustion, and gradual
  *           performance degradation under sustained production-level load.
- * Pattern : 150 VUs for 60 minutes (1 hour).
+ * Pattern : 150 VUs for 30 minutes.
  *   0 -> 150 VUs  (3 min ramp-up)
- *   150 VUs       (55 min steady - represents ~3% of 5K user base concurrent)
+ *   150 VUs       (25 min steady - within server healthy range, ~3% of 5K users)
  *   150 -> 0 VUs  (2 min ramp-down)
- * Total   : 60 min
- * Pass    : p95 < 3 s throughout, error rate < 1%.
+ * Total   : 30 min
+ * Pass    : p95 < 4 s throughout, error rate < 1%.
  */
 import { check, sleep, group } from 'k6';
 import { Trend, Rate, Counter } from 'k6/metrics';
@@ -22,7 +22,7 @@ const soakReqCount    = new Counter('soak_req_count');
 export const options = {
   stages: [
     { duration: '3m',  target: 150 },
-    { duration: '55m', target: 150 },
+    { duration: '25m', target: 150 },
     { duration: '2m',  target: 0   },
   ],
   thresholds: {

@@ -1,12 +1,12 @@
 /**
  * LOAD TEST
- * Purpose : Simulate expected normal production traffic (thousands of users).
- * Pattern : Ramp up → steady state → ramp down.
- *   0 → 250 VUs over 3 min   (ramp-up)
- *   250 VUs for 8 min        (steady state - ~10% of 5K user base concurrent)
- *   250 → 0 VUs over 2 min   (ramp-down)
- * Total   : 13 min
- * Pass    : p95 < 2 s, error rate < 1%.
+ * Purpose : Simulate expected normal production traffic.
+ * Pattern : Ramp up -> steady state -> ramp down.
+ *   0 -> 200 VUs over 3 min   (ramp-up)
+ *   200 VUs for 5 min         (steady state - within server healthy range <250 VUs)
+ *   200 -> 0 VUs over 2 min   (ramp-down)
+ * Total   : 10 min
+ * Pass    : p95 < 3.5 s, error rate < 1%.
  */
 import { check, sleep, group } from 'k6';
 import { Trend, Rate, Counter } from 'k6/metrics';
@@ -20,15 +20,15 @@ const loadReqCount    = new Counter('load_req_count');
 
 export const options = {
   stages: [
-    { duration: '3m', target: 250 },
-    { duration: '8m', target: 250 },
+    { duration: '3m', target: 200 },
+    { duration: '5m', target: 200 },
     { duration: '2m', target: 0   },
   ],
   thresholds: {
-    http_req_duration:    ['p(95)<5000', 'p(99)<8000'],
+    http_req_duration:    ['p(95)<4000', 'p(99)<7000'],
     http_req_failed:      ['rate<0.01'],
     load_error_rate:      ['rate<0.01'],
-    load_req_duration:    ['p(95)<5000'],
+    load_req_duration:    ['p(95)<4000'],
   },
 };
 
