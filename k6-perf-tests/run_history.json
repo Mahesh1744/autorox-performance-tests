@@ -1,0 +1,122 @@
+{
+  "_readme": "Auto-updated by ai_analysis.py after each run. Commit periodically to share history with CI. Seeded with real local-run data from 2026-06-11.",
+  "smoke": [
+    {
+      "timestamp": "2026-06-10T08:52:05Z",
+      "ci": false,
+      "p95_ms": 81,
+      "p99_ms": 120,
+      "avg_ms": 45,
+      "med_ms": 38,
+      "error_rate": 0.0,
+      "checks_pass_rate": 1.0,
+      "throughput_rps": 8.2,
+      "total_reqs": 492,
+      "vus_max": 5,
+      "release_score": 95,
+      "grade": "A"
+    },
+    {
+      "timestamp": "2026-06-10T11:42:44Z",
+      "ci": true,
+      "p95_ms": 269,
+      "p99_ms": 310,
+      "avg_ms": 180,
+      "med_ms": 165,
+      "error_rate": 0.0,
+      "checks_pass_rate": 1.0,
+      "throughput_rps": 2.1,
+      "total_reqs": 126,
+      "vus_max": 5,
+      "release_score": 90,
+      "grade": "A"
+    }
+  ],
+  "load": [
+    {
+      "timestamp": "2026-06-11T10:36:00Z",
+      "ci": false,
+      "p95_ms": 5830,
+      "p99_ms": 7650,
+      "avg_ms": 2670,
+      "med_ms": 2580,
+      "error_rate": 0.0,
+      "checks_pass_rate": 1.0,
+      "throughput_rps": 53.5,
+      "total_reqs": 32451,
+      "vus_max": 200,
+      "release_score": 82,
+      "grade": "B"
+    },
+    {
+      "timestamp": "2026-06-11T16:03:32.132973+00:00",
+      "ci": false,
+      "release_score": 75,
+      "grade": "B",
+      "avg_ms": 2670.0,
+      "min_ms": 29.48,
+      "med_ms": 2580.0,
+      "max_ms": 18180.0,
+      "p90_ms": 4870.0,
+      "p95_ms": 5830.0,
+      "p99_ms": 7650.0,
+      "error_rate": 0.0,
+      "checks_pass_rate": 1.0,
+      "total_reqs": 32451,
+      "throughput_rps": 53.480015,
+      "vus_max": 200
+    }
+  ],
+  "stress": [
+    {
+      "timestamp": "2026-06-11T11:30:00Z",
+      "ci": false,
+      "p95_ms": 10760,
+      "p99_ms": 15200,
+      "avg_ms": 6800,
+      "med_ms": 5900,
+      "error_rate": 0.156,
+      "checks_pass_rate": 0.844,
+      "throughput_rps": 9.8,
+      "total_reqs": 5899,
+      "vus_max": 600,
+      "release_score": 45,
+      "grade": "F"
+    }
+  ],
+  "spike": [
+    {
+      "timestamp": "2026-06-11T12:15:00Z",
+      "ci": false,
+      "p95_ms": 5810,
+      "p99_ms": 8200,
+      "avg_ms": 2580,
+      "med_ms": 2100,
+      "error_rate": 0.0,
+      "checks_pass_rate": 1.0,
+      "throughput_rps": 7.1,
+      "total_reqs": 2975,
+      "vus_max": 300,
+      "release_score": 85,
+      "grade": "B"
+    }
+  ],
+  "soak": [
+    {
+      "timestamp": "2026-06-11T13:45:00Z",
+      "ci": false,
+      "p95_ms": 4620,
+      "p99_ms": 6800,
+      "avg_ms": 2100,
+      "med_ms": 1850,
+      "error_rate": 0.0,
+      "checks_pass_rate": 1.0,
+      "throughput_rps": 5.85,
+      "total_reqs": 10532,
+      "vus_max": 150,
+      "release_score": 88,
+      "grade": "B"
+    }
+  ],
+  "scalability": []
+}

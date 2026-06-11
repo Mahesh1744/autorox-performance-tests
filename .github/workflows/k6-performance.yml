@@ -57,20 +57,27 @@ jobs:
           python3 k6-perf-tests/check_regression.py \
             smoke k6-perf-tests/results/smoke_ci.log 20
 
-      - name: Post Job Summary
+      - name: Setup Python
         if: always()
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: AI Analysis & Step Summary
+        if: always()
+        continue-on-error: true
         run: |
-          echo "## Smoke Test Results" >> $GITHUB_STEP_SUMMARY
-          echo '```' >> $GITHUB_STEP_SUMMARY
-          grep -E "check|http_req_duration|http_req_failed|iterations" \
-            k6-perf-tests/results/smoke_ci.log | tail -30 >> $GITHUB_STEP_SUMMARY || true
-          echo '```' >> $GITHUB_STEP_SUMMARY
+          python3 k6-perf-tests/ai_analysis.py \
+            --test-type smoke \
+            --log k6-perf-tests/results/smoke_ci.log \
+            --ci
 
       - name: Notify Slack on Failure
         if: failure() && env.SLACK_WEBHOOK_URL != ''
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
         run: |
+          SCORE=$(grep -oP 'release_score.: \K[\d]+' k6-perf-tests/results/ai_report_smoke.md 2>/dev/null | head -1 || echo "N/A")
           curl -s -X POST "$SLACK_WEBHOOK_URL" \
             -H 'Content-type: application/json' \
             -d "{
@@ -80,6 +87,7 @@ jobs:
                 \"fields\": [
                   {\"title\": \"Branch\", \"value\": \"${{ github.ref_name }}\", \"short\": true},
                   {\"title\": \"Triggered by\", \"value\": \"${{ github.actor }}\", \"short\": true},
+                  {\"title\": \"AI Release Score\", \"value\": \"${SCORE}/100 — see Actions summary for RCA\", \"short\": true},
                   {\"title\": \"View Run\", \"value\": \"${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}\", \"short\": false}
                 ]
               }]
@@ -131,20 +139,27 @@ jobs:
           python3 k6-perf-tests/check_regression.py \
             load k6-perf-tests/results/load_ci.log 20
 
-      - name: Post Job Summary
+      - name: Setup Python
         if: always()
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: AI Analysis & Step Summary
+        if: always()
+        continue-on-error: true
         run: |
-          echo "## Load Test Results" >> $GITHUB_STEP_SUMMARY
-          echo '```' >> $GITHUB_STEP_SUMMARY
-          grep -E "check|http_req_duration|http_req_failed|iterations" \
-            k6-perf-tests/results/load_ci.log | tail -30 >> $GITHUB_STEP_SUMMARY || true
-          echo '```' >> $GITHUB_STEP_SUMMARY
+          python3 k6-perf-tests/ai_analysis.py \
+            --test-type load \
+            --log k6-perf-tests/results/load_ci.log \
+            --ci
 
       - name: Notify Slack on Failure
         if: failure() && env.SLACK_WEBHOOK_URL != ''
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
         run: |
+          SCORE=$(grep -oP 'release_score.: \K[\d]+' k6-perf-tests/results/ai_report_load.md 2>/dev/null | head -1 || echo "N/A")
           curl -s -X POST "$SLACK_WEBHOOK_URL" \
             -H 'Content-type: application/json' \
             -d "{
@@ -154,6 +169,7 @@ jobs:
                 \"fields\": [
                   {\"title\": \"Branch\", \"value\": \"${{ github.ref_name }}\", \"short\": true},
                   {\"title\": \"Triggered by\", \"value\": \"${{ github.actor }}\", \"short\": true},
+                  {\"title\": \"AI Release Score\", \"value\": \"${SCORE}/100 — see Actions summary for RCA\", \"short\": true},
                   {\"title\": \"View Run\", \"value\": \"${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}\", \"short\": false}
                 ]
               }]
@@ -205,20 +221,27 @@ jobs:
           python3 k6-perf-tests/check_regression.py \
             stress k6-perf-tests/results/stress_ci.log 20
 
-      - name: Post Job Summary
+      - name: Setup Python
         if: always()
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: AI Analysis & Step Summary
+        if: always()
+        continue-on-error: true
         run: |
-          echo "## Stress Test Results" >> $GITHUB_STEP_SUMMARY
-          echo '```' >> $GITHUB_STEP_SUMMARY
-          grep -E "check|http_req_duration|http_req_failed|iterations" \
-            k6-perf-tests/results/stress_ci.log | tail -30 >> $GITHUB_STEP_SUMMARY || true
-          echo '```' >> $GITHUB_STEP_SUMMARY
+          python3 k6-perf-tests/ai_analysis.py \
+            --test-type stress \
+            --log k6-perf-tests/results/stress_ci.log \
+            --ci
 
       - name: Notify Slack on Failure
         if: failure() && env.SLACK_WEBHOOK_URL != ''
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
         run: |
+          SCORE=$(grep -oP 'release_score.: \K[\d]+' k6-perf-tests/results/ai_report_stress.md 2>/dev/null | head -1 || echo "N/A")
           curl -s -X POST "$SLACK_WEBHOOK_URL" \
             -H 'Content-type: application/json' \
             -d "{
@@ -228,6 +251,7 @@ jobs:
                 \"fields\": [
                   {\"title\": \"Branch\", \"value\": \"${{ github.ref_name }}\", \"short\": true},
                   {\"title\": \"Triggered by\", \"value\": \"${{ github.actor }}\", \"short\": true},
+                  {\"title\": \"AI Release Score\", \"value\": \"${SCORE}/100 — see Actions summary for RCA\", \"short\": true},
                   {\"title\": \"View Run\", \"value\": \"${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}\", \"short\": false}
                 ]
               }]
@@ -279,20 +303,27 @@ jobs:
           python3 k6-perf-tests/check_regression.py \
             spike k6-perf-tests/results/spike_ci.log 20
 
-      - name: Post Job Summary
+      - name: Setup Python
         if: always()
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: AI Analysis & Step Summary
+        if: always()
+        continue-on-error: true
         run: |
-          echo "## Spike Test Results" >> $GITHUB_STEP_SUMMARY
-          echo '```' >> $GITHUB_STEP_SUMMARY
-          grep -E "check|http_req_duration|http_req_failed|iterations" \
-            k6-perf-tests/results/spike_ci.log | tail -30 >> $GITHUB_STEP_SUMMARY || true
-          echo '```' >> $GITHUB_STEP_SUMMARY
+          python3 k6-perf-tests/ai_analysis.py \
+            --test-type spike \
+            --log k6-perf-tests/results/spike_ci.log \
+            --ci
 
       - name: Notify Slack on Failure
         if: failure() && env.SLACK_WEBHOOK_URL != ''
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
         run: |
+          SCORE=$(grep -oP 'release_score.: \K[\d]+' k6-perf-tests/results/ai_report_spike.md 2>/dev/null | head -1 || echo "N/A")
           curl -s -X POST "$SLACK_WEBHOOK_URL" \
             -H 'Content-type: application/json' \
             -d "{
@@ -302,6 +333,7 @@ jobs:
                 \"fields\": [
                   {\"title\": \"Branch\", \"value\": \"${{ github.ref_name }}\", \"short\": true},
                   {\"title\": \"Triggered by\", \"value\": \"${{ github.actor }}\", \"short\": true},
+                  {\"title\": \"AI Release Score\", \"value\": \"${SCORE}/100 — see Actions summary for RCA\", \"short\": true},
                   {\"title\": \"View Run\", \"value\": \"${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}\", \"short\": false}
                 ]
               }]
@@ -354,20 +386,27 @@ jobs:
           python3 k6-perf-tests/check_regression.py \
             soak k6-perf-tests/results/soak_ci.log 20
 
-      - name: Post Job Summary
+      - name: Setup Python
         if: always()
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: AI Analysis & Step Summary
+        if: always()
+        continue-on-error: true
         run: |
-          echo "## Soak Test Results" >> $GITHUB_STEP_SUMMARY
-          echo '```' >> $GITHUB_STEP_SUMMARY
-          grep -E "check|http_req_duration|http_req_failed|iterations" \
-            k6-perf-tests/results/soak_ci.log | tail -30 >> $GITHUB_STEP_SUMMARY || true
-          echo '```' >> $GITHUB_STEP_SUMMARY
+          python3 k6-perf-tests/ai_analysis.py \
+            --test-type soak \
+            --log k6-perf-tests/results/soak_ci.log \
+            --ci
 
       - name: Notify Slack on Failure
         if: failure() && env.SLACK_WEBHOOK_URL != ''
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
         run: |
+          SCORE=$(grep -oP 'release_score.: \K[\d]+' k6-perf-tests/results/ai_report_soak.md 2>/dev/null | head -1 || echo "N/A")
           curl -s -X POST "$SLACK_WEBHOOK_URL" \
             -H 'Content-type: application/json' \
             -d "{
@@ -377,6 +416,7 @@ jobs:
                 \"fields\": [
                   {\"title\": \"Branch\", \"value\": \"${{ github.ref_name }}\", \"short\": true},
                   {\"title\": \"Triggered by\", \"value\": \"${{ github.actor }}\", \"short\": true},
+                  {\"title\": \"AI Release Score\", \"value\": \"${SCORE}/100 — see Actions summary for RCA\", \"short\": true},
                   {\"title\": \"View Run\", \"value\": \"${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}\", \"short\": false}
                 ]
               }]
@@ -428,20 +468,27 @@ jobs:
           python3 k6-perf-tests/check_regression.py \
             scalability k6-perf-tests/results/scalability_ci.log 20
 
-      - name: Post Job Summary
+      - name: Setup Python
         if: always()
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: AI Analysis & Step Summary
+        if: always()
+        continue-on-error: true
         run: |
-          echo "## Scalability Test Results" >> $GITHUB_STEP_SUMMARY
-          echo '```' >> $GITHUB_STEP_SUMMARY
-          grep -E "check|http_req_duration|http_req_failed|iterations|step_" \
-            k6-perf-tests/results/scalability_ci.log | tail -30 >> $GITHUB_STEP_SUMMARY || true
-          echo '```' >> $GITHUB_STEP_SUMMARY
+          python3 k6-perf-tests/ai_analysis.py \
+            --test-type scalability \
+            --log k6-perf-tests/results/scalability_ci.log \
+            --ci
 
       - name: Notify Slack on Failure
         if: failure() && env.SLACK_WEBHOOK_URL != ''
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
         run: |
+          SCORE=$(grep -oP 'release_score.: \K[\d]+' k6-perf-tests/results/ai_report_scalability.md 2>/dev/null | head -1 || echo "N/A")
           curl -s -X POST "$SLACK_WEBHOOK_URL" \
             -H 'Content-type: application/json' \
             -d "{
@@ -451,6 +498,7 @@ jobs:
                 \"fields\": [
                   {\"title\": \"Branch\", \"value\": \"${{ github.ref_name }}\", \"short\": true},
                   {\"title\": \"Triggered by\", \"value\": \"${{ github.actor }}\", \"short\": true},
+                  {\"title\": \"AI Release Score\", \"value\": \"${SCORE}/100 — see Actions summary for RCA\", \"short\": true},
                   {\"title\": \"View Run\", \"value\": \"${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}\", \"short\": false}
                 ]
               }]
