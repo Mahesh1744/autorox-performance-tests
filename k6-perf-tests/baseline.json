@@ -11,9 +11,9 @@
                  "note":  "Updated 2026-06-09 from actual 250-VU run (6476 iters, 0.09% errors, 99 req/s)"
              },
     "stress":  {
-                   "p95":  10300,
+                   "p95":  13000,
                    "vus":  "100-1000",
-                   "note":  "Updated 2026-06-09 from actual 1000-VU run (22.78% errors above ~500 VUs, 9999 iters)"
+                   "note":  "Updated 2026-06-11 from CI run (p95=12.71s, 29% errors at 1000 VUs). CI runner US->Mumbai adds latency vs local 10.3s."
                },
     "spike":  {
                   "p95":  11300,
