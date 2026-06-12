@@ -134,7 +134,7 @@
       "checks_pass_rate": 0.9898,
       "total_reqs": 105241,
       "throughput_rps": 94.753178,
-      "vus_max": 850
+      "vus_max": 500
     }
   ]
 }

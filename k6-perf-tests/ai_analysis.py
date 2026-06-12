@@ -119,9 +119,15 @@ def parse_k6_log(path: Path) -> dict:
         m["throughput_rps"] = float(r.group(2))
 
     # vus_max          -> N   min=N  max=N
-    v = re.search(r"vus_max[^:]+:\s+(\d+)", text)
-    if v:
-        m["vus_max"] = int(v.group(1))
+    # For multi-scenario tests (scalability) k6 reports pool reservation, not peak load.
+    # Use the max VU count from the scenario progress lines instead when available.
+    scenario_vus = re.findall(r'\]\s+(\d+)\s+VUs\s+\d+m', text)
+    if scenario_vus:
+        m["vus_max"] = max(int(x) for x in scenario_vus)
+    else:
+        v = re.search(r"vus_max[^:]+:\s+(\d+)", text)
+        if v:
+            m["vus_max"] = int(v.group(1))
 
     return {k: val for k, val in m.items() if val is not None}
 
