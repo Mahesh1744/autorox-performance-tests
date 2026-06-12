@@ -118,5 +118,23 @@
       "grade": "B"
     }
   ],
-  "scalability": []
+  "scalability": [
+    {
+      "timestamp": "2026-06-12T05:16:07.050195+00:00",
+      "ci": false,
+      "release_score": 67,
+      "grade": "C",
+      "avg_ms": 1810.0,
+      "med_ms": 902.99,
+      "max_ms": 19880.0,
+      "p90_ms": 4800.0,
+      "p95_ms": 6550.0,
+      "p99_ms": 9980.0,
+      "error_rate": 0.0187,
+      "checks_pass_rate": 0.9898,
+      "total_reqs": 105241,
+      "throughput_rps": 94.753178,
+      "vus_max": 850
+    }
+  ]
 }

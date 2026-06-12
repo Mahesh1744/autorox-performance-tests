@@ -26,8 +26,8 @@
                  "note":  "Updated 2026-06-11 from local 30-min run (0% errors, p95=4.62s, 10532 iters, 3.6 GB data)."
              },
     "scalability":  {
-                        "p95":  null,
+                        "p95":  6550,
                         "vus":  "25-500",
-                        "note":  "Config changed 2026-06-11: 50-1000 reduced to 25-500 VUs, 7->6 steps. Re-run to establish new baseline."
+                        "note":  "Updated 2026-06-12 from local 6-step run (1.87% errors, p95=6.55s, 10107 iters, 94.8 rps). All thresholds passed."
                     }
 }
