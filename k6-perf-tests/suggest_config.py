@@ -51,14 +51,16 @@ def analyse(test_type: str, runs: list) -> None:
     if p95s:
         mean_p95 = _mean(p95s)
         trend    = p95s[-1] - p95s[0] if len(p95s) > 1 else 0.0
-        print(f"  P95:    mean={mean_p95:.0f} ms, latest={p95s[-1]:.0f} ms, trend={trend:+.0f} ms")
+        print(f"  P95:    mean={mean_p95:.0f} ms, latest={p95s[-1]:.0f} ms, trend={trend:+.0f} ms over {len(p95s)} runs")
         if len(p95s) >= 3:
             std = statistics.stdev(p95s)
-            print(f"          stdev={std:.0f} ms  (adaptive threshold would be {mean_p95 + 2 * std:.0f} ms)")
-        if trend > mean_p95 * 0.15:
-            print("  WARN:   P95 trending UP -- investigate degradation before increasing load")
-        elif len(p95s) >= 3 and trend < mean_p95 * -0.10:
-            print("  GOOD:   P95 trending DOWN -- consider increasing VU count by 10-20%")
+            print(f"          stdev={std:.0f} ms  (adaptive threshold kicks in after {max(0, 5-len(p95s))} more runs)")
+        # Need >= 4 data points before trend warnings are statistically meaningful
+        if len(p95s) >= 4:
+            if trend > mean_p95 * 0.15:
+                print("  WARN:   P95 trending UP -- investigate degradation before increasing load")
+            elif trend < mean_p95 * -0.10:
+                print("  GOOD:   P95 trending DOWN -- consider increasing VU count by 10-20%")
 
     # Error rate
     if errs:
@@ -70,13 +72,14 @@ def analyse(test_type: str, runs: list) -> None:
             print("  GOOD:   Error rate consistently below 0.5% -- stable under current config")
 
     # Release scores
+    p95_rising = len(p95s) >= 4 and p95s[-1] > _mean(p95s) * 1.15
     if scores:
         mean_score   = _mean(scores)
         latest_score = scores[-1]
         print(f"  Score:  mean={mean_score:.0f}/100, latest={latest_score}/100")
         if mean_score < 70:
             print("  WARN:   Consistently below 70/100 -- current config is too aggressive")
-        elif mean_score >= 90 and latest_score >= 90:
+        elif mean_score >= 90 and latest_score >= 90 and not p95_rising:
             print("  SUGGEST: Consistently A-grade -- safe to increase VUs by 20-30%")
         elif 70 <= mean_score < 80:
             print("  SUGGEST: Borderline B-grade -- keep current VUs, focus on reducing p95")
