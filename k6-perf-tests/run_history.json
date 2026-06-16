@@ -30,6 +30,32 @@
       "vus_max": 5,
       "release_score": 90,
       "grade": "A"
+    },
+    {
+      "timestamp": "2026-06-12T09:48:10.859401+00:00",
+      "ci": false,
+      "release_score": 93,
+      "grade": "A",
+      "avg_ms": 45.87,
+      "min_ms": 11.46,
+      "med_ms": 39.66,
+      "max_ms": 359.87,
+      "p90_ms": 68.69,
+      "p95_ms": 83.56,
+      "p99_ms": 134.64,
+      "error_rate": 0.0,
+      "checks_pass_rate": 1.0,
+      "total_reqs": 4112,
+      "throughput_rps": 33.78738,
+      "vus_max": 5
+    },
+    {
+      "timestamp": "2026-06-12T10:19:00.952559+00:00",
+      "ci": false,
+      "release_score": 73,
+      "grade": "B",
+      "error_rate": 0.0,
+      "vus_max": 5
     }
   ],
   "load": [
