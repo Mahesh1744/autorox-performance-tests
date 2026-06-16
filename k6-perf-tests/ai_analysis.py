@@ -46,6 +46,10 @@ STATIC_P95 = {
 
 TEST_TYPES = list(STATIC_P95.keys())
 
+# These tests intentionally push the server to its limit -- low scores are expected
+# and do NOT indicate a release problem.
+LIMIT_FINDING_TESTS = {"stress", "scalability", "breakpoint"}
+
 
 # ---------------------------------------------------------------------------
 # Log parsing
@@ -210,7 +214,8 @@ def adaptive_p95(past: list) -> float | None:
 # Release readiness score  (0-100)
 # ---------------------------------------------------------------------------
 
-def compute_score(metrics: dict, past: list, static_p95_ms: float | None = None) -> dict:
+def compute_score(metrics: dict, past: list, static_p95_ms: float | None = None,
+                  test_type: str = "") -> dict:
     comps: dict[str, tuple[int, int, str]] = {}
 
     # P95 latency  -- 40 pts
@@ -261,6 +266,9 @@ def compute_score(metrics: dict, past: list, static_p95_ms: float | None = None)
     elif total >= 70: grade, verdict = "B", "ACCEPTABLE -- monitor closely"
     elif total >= 50: grade, verdict = "C", "BORDERLINE -- review before release"
     else:             grade, verdict = "F", "NOT READY -- block release"
+
+    if test_type in LIMIT_FINDING_TESTS:
+        verdict = "LIMIT FINDING -- informational only, not a release gate"
 
     return {"total": total, "grade": grade, "verdict": verdict, "components": comps}
 
@@ -380,7 +388,9 @@ def predict_bottleneck(history: dict) -> dict | None:
 # Reporting
 # ---------------------------------------------------------------------------
 
-def _badge(grade: str) -> str:
+def _badge(grade: str, test_type: str = "") -> str:
+    if test_type in LIMIT_FINDING_TESTS:
+        return "INFO"
     return {"A": "PASS", "B": "PASS", "C": "WARN", "F": "FAIL"}.get(grade, "")
 
 
@@ -391,7 +401,7 @@ def build_markdown(
     ts = datetime.now().strftime("%Y-%m-%d %H:%M UTC")
     g  = score["grade"]
     lines = [
-        f"## [{_badge(g)}] AI Analysis: {test_type.upper()} -- {ts}",
+        f"## [{_badge(g, test_type)}] AI Analysis: {test_type.upper()} -- {ts}",
         "",
         f"**Release Score: {score['total']}/100 (Grade {g}) -- {score['verdict']}**",
         "",
@@ -498,7 +508,7 @@ def main() -> None:
     past       = [r for r in history.get(args.test_type, []) if isinstance(r, dict)]
 
     anomalies  = detect_anomalies(metrics, past)
-    score      = compute_score(metrics, past, STATIC_P95.get(args.test_type))
+    score      = compute_score(metrics, past, STATIC_P95.get(args.test_type), args.test_type)
     rca        = generate_rca(metrics, past)
     bottleneck = predict_bottleneck(history)
 
@@ -536,8 +546,9 @@ def main() -> None:
         n = len(history[args.test_type])
         print(f"[AI] History updated ({n} {args.test_type} run{'s' if n != 1 else ''} stored)")
 
-    # Exit 1 on grade F so CI can optionally treat it as a gate
-    sys.exit(1 if score["grade"] == "F" else 0)
+    # Exit 1 on grade F for release-gate tests only; limit-finding tests never block CI
+    is_gate = args.test_type not in LIMIT_FINDING_TESTS
+    sys.exit(1 if score["grade"] == "F" and is_gate else 0)
 
 
 if __name__ == "__main__":

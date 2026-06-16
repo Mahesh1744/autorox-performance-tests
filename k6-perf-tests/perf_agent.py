@@ -233,7 +233,7 @@ def _run_ai_analysis(test_type: str, log_file: Path) -> None:
         history    = ai.load_history()
         past       = [r for r in history.get(test_type, []) if isinstance(r, dict)]
         anomalies  = ai.detect_anomalies(metrics, past)
-        score      = ai.compute_score(metrics, past, ai.STATIC_P95.get(test_type))
+        score      = ai.compute_score(metrics, past, ai.STATIC_P95.get(test_type), test_type)
         rca        = ai.generate_rca(metrics, past)
         bottleneck = ai.predict_bottleneck(history)
 
@@ -341,8 +341,10 @@ def show_history() -> None:
         p95   = f"{lat['p95_ms']:.0f} ms" if lat.get("p95_ms") else "—"
         score = str(lat.get("release_score", "—"))
         grade = lat.get("grade", "—")
-        gc    = {"A": _C.GREEN, "B": _C.GREEN, "C": _C.YELLOW, "F": _C.RED}.get(grade, _C.WHITE)
-        print(f"  {tt:<14} {len(runs):>5}  {p95:>11}  {score:>5}/100  {_c(gc, grade)}")
+        is_lf = tt in ("stress", "scalability", "breakpoint")
+        gc    = _C.WHITE if is_lf else {"A": _C.GREEN, "B": _C.GREEN, "C": _C.YELLOW, "F": _C.RED}.get(grade, _C.WHITE)
+        note  = " (limit-finding)" if is_lf else ""
+        print(f"  {tt:<14} {len(runs):>5}  {p95:>11}  {score:>5}/100  {_c(gc, grade)}{note}")
     print()
 
 
@@ -385,8 +387,9 @@ def _menu_header() -> None:
             for tt in RUN_SEQUENCE:
                 runs = [r for r in history.get(tt, []) if isinstance(r, dict)]
                 if runs:
-                    g = runs[-1].get("grade", "?")
-                    gc = {"A": _C.GREEN, "B": _C.GREEN, "C": _C.YELLOW, "F": _C.RED}.get(g, _C.WHITE)
+                    g     = runs[-1].get("grade", "?")
+                    is_lf = tt in ("stress", "scalability", "breakpoint")
+                    gc    = _C.WHITE if is_lf else {"A": _C.GREEN, "B": _C.GREEN, "C": _C.YELLOW, "F": _C.RED}.get(g, _C.WHITE)
                     parts.append(f"{tt[0].upper()}:{_c(gc, g)}")
             if parts:
                 print(f"  Scores: {' '.join(parts)}")
