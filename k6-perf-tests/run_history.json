@@ -91,6 +91,23 @@
       "total_reqs": 32451,
       "throughput_rps": 53.480015,
       "vus_max": 200
+    },
+    {
+      "timestamp": "2026-06-16T05:57:44.523218+00:00",
+      "ci": false,
+      "release_score": 63,
+      "grade": "C",
+      "avg_ms": 2620.0,
+      "med_ms": 2210.0,
+      "max_ms": 60000.0,
+      "p90_ms": 5030.0,
+      "p95_ms": 6170.0,
+      "p99_ms": 9160.0,
+      "error_rate": 0.0003,
+      "checks_pass_rate": 0.9997,
+      "total_reqs": 32791,
+      "throughput_rps": 52.577643,
+      "vus_max": 200
     }
   ],
   "stress": [
