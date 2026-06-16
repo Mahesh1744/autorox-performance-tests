@@ -20,6 +20,8 @@ HISTORY_FILE = Path(__file__).parent / "run_history.json"
 
 TEST_ORDER = ["smoke", "load", "stress", "spike", "soak", "scalability"]
 
+LIMIT_FINDING_TESTS = {"stress", "scalability", "breakpoint"}
+
 
 def load_history() -> dict:
     if HISTORY_FILE.exists():
@@ -45,7 +47,9 @@ def analyse(test_type: str, runs: list) -> None:
     scores = [r["release_score"]  for r in recent if r.get("release_score") is not None]
     tputs  = [r["throughput_rps"] for r in recent if r.get("throughput_rps") is not None]
 
-    print(f"\n  [{test_type.upper()}]  ({len(recent)} recent run{'s' if len(recent) != 1 else ''})")
+    is_lf = test_type in LIMIT_FINDING_TESTS
+    label = "  (limit-finding)" if is_lf else ""
+    print(f"\n  [{test_type.upper()}]{label}  ({len(recent)} recent run{'s' if len(recent) != 1 else ''})")
 
     # P95 trend
     if p95s:
@@ -66,18 +70,25 @@ def analyse(test_type: str, runs: list) -> None:
     if errs:
         mean_err = _mean(errs)
         print(f"  Errors: mean={mean_err * 100:.2f}%")
-        if mean_err > 0.05:
-            print("  WARN:   Error rate above 5% -- reduce load or fix errors before scaling up")
-        elif mean_err < 0.005 and len(errs) >= 3:
-            print("  GOOD:   Error rate consistently below 0.5% -- stable under current config")
+        if is_lf:
+            if mean_err > 0.05:
+                print("  INFO:   Errors at peak load are expected for limit-finding tests")
+        else:
+            if mean_err > 0.05:
+                print("  WARN:   Error rate above 5% -- reduce load or fix errors before scaling up")
+            elif mean_err < 0.005 and len(errs) >= 3:
+                print("  GOOD:   Error rate consistently below 0.5% -- stable under current config")
 
     # Release scores
     p95_rising = len(p95s) >= 4 and p95s[-1] > _mean(p95s) * 1.15
     if scores:
         mean_score   = _mean(scores)
         latest_score = scores[-1]
-        print(f"  Score:  mean={mean_score:.0f}/100, latest={latest_score}/100")
-        if mean_score < 70:
+        print(f"  Score:  mean={mean_score:.0f}/100, latest={latest_score}/100  (informational)" if is_lf
+              else f"  Score:  mean={mean_score:.0f}/100, latest={latest_score}/100")
+        if is_lf:
+            pass  # scores below 70 are normal for limit-finding tests
+        elif mean_score < 70:
             print("  WARN:   Consistently below 70/100 -- current config is too aggressive")
         elif mean_score >= 90 and latest_score >= 90 and not p95_rising:
             print("  SUGGEST: Consistently A-grade -- safe to increase VUs by 20-30%")
