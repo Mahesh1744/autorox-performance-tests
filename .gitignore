@@ -1,3 +1,7 @@
+# Python cache
+__pycache__/
+*.pyc
+
 # k6 result files (large JSON/logs)
 k6-perf-tests/results/*.json
 k6-perf-tests/results/*.log
